@@ -107,13 +107,19 @@
                             <table class="w-full">
                                 <thead>
                                     <tr class="text-left text-xs font-semibold text-gray-500 uppercase border-b border-gray-200">
-                                        <th class="px-4 pb-2 w-2/5">
+                                        <th class="px-4 pb-2 w-1/6">
                                             <i class="fas fa-map-marker-alt mr-1"></i> Destination
                                         </th>
-                                        <th class="px-4 pb-2 w-2/5">
+                                        <th class="px-4 pb-2 w-1/6">
                                             <i class="fas fa-clock mr-1"></i> Départ
                                         </th>
-                                        <th class="px-4 pb-2 w-1/5">
+                                        <th class="px-4 pb-2 w-1/6">
+                                            <i class="fas fa-bus mr-1"></i> Bus
+                                        </th>
+                                        <th class="px-4 pb-2 w-1/6">
+                                            <i class="fas fa-money-bill-wave mr-1"></i> Prix
+                                        </th>
+                                        <th class="px-4 pb-2 w-1/6">
                                             <i class="fas fa-info-circle mr-1"></i> Statut
                                         </th>
                                     </tr>
@@ -134,6 +140,30 @@
                                                             <i class="fas fa-arrow-right text-xs mr-1"></i>
                                                             {{ $departure->new_time }}
                                                         </span>
+                                                    @endif
+                                                </div>
+                                            </td>
+                                            <td class="px-4 py-2">
+                                                <div class="text-sm text-gray-900">
+                                                    @if(isset($departure->bus_number))
+                                                        <span class="font-medium">{{ $departure->bus_number }}</span>
+                                                    @else
+                                                        <span class="font-medium">Bus 01</span>
+                                                    @endif
+                                                    <br>
+                                                    @if(isset($departure->bus_plate))
+                                                        <span class="text-xs text-gray-600">{{ $departure->bus_plate }}</span>
+                                                    @else
+                                                        <span class="text-xs text-gray-600">DK-0001-AA</span>
+                                                    @endif
+                                                </div>
+                                            </td>
+                                            <td class="px-4 py-2">
+                                                <div class="text-sm font-medium text-gray-900">
+                                                    @if(isset($departure->price))
+                                                        {{ number_format($departure->price, 0, ',', ' ') }} FCFA
+                                                    @else
+                                                        15 000 FCFA
                                                     @endif
                                                 </div>
                                             </td>
