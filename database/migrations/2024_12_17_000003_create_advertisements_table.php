@@ -11,9 +11,11 @@ return new class extends Migration
         Schema::create('advertisements', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->string('video_path');
-            $table->boolean('is_active')->default(true);
+            $table->enum('video_type', ['upload', 'youtube', 'drive']);
+            $table->string('video_file')->nullable();
+            $table->string('video_link')->nullable();
             $table->integer('display_order')->default(0);
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }
