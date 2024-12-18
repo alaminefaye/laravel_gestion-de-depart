@@ -11,6 +11,8 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReservationController;
 
 Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
 
@@ -48,6 +50,19 @@ Route::middleware(['auth'])->group(function () {
         // Gestion des publicités
         Route::resource('advertisements', AdvertisementController::class);
         
+        // Gestion des réservations
+        Route::middleware(['auth'])->prefix('reservations')->name('reservations.')->group(function () {
+            Route::get('/', [ReservationController::class, 'index'])->name('index');
+            Route::get('/{reservation}', [ReservationController::class, 'show'])->name('show');
+            Route::get('/create', [ReservationController::class, 'create'])->name('create');
+            Route::post('/', [ReservationController::class, 'store'])->name('store');
+            Route::get('/{reservation}/edit', [ReservationController::class, 'edit'])->name('edit');
+            Route::put('/{reservation}', [ReservationController::class, 'update'])->name('update');
+            Route::delete('/{reservation}', [ReservationController::class, 'destroy'])->name('destroy');
+            Route::post('/{reservation}/confirm', [ReservationController::class, 'confirm'])->name('confirm');
+            Route::post('/{reservation}/cancel', [ReservationController::class, 'cancel'])->name('cancel');
+        });
+        
         // Gestion des annonces
         Route::resource('announcements', AnnouncementController::class);
         Route::patch('/announcements/{announcement}/toggle', [AnnouncementController::class, 'toggle'])
@@ -56,6 +71,11 @@ Route::middleware(['auth'])->group(function () {
         // Paramètres
         Route::get('/settings', [SettingController::class, 'index'])->name('settings');
         Route::put('/settings/update', [SettingController::class, 'update'])->name('settings.update');
+        Route::put('/settings/profile', [SettingController::class, 'updateProfile'])->name('settings.profile');
+
+        // Profile
+        Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+        Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     });
 });
 

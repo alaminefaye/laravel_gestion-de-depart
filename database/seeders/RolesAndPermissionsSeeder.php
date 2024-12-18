@@ -5,91 +5,127 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\PermissionRegistrar;
 
 class RolesAndPermissionsSeeder extends Seeder
 {
-    public function run()
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void
     {
         // Reset cached roles and permissions
-        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+        app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
-        // Create permissions
-        $permissions = [
-            // User permissions
+        // Create permissions for users
+        $userPermissions = [
             'view users',
             'create users',
             'edit users',
             'delete users',
-            
-            // Role permissions
+        ];
+
+        // Create permissions for roles
+        $rolePermissions = [
             'view roles',
             'create roles',
             'edit roles',
             'delete roles',
-            
-            // Bus permissions
-            'view buses',
-            'create buses',
-            'edit buses',
-            'delete buses',
-            
-            // Departure permissions
+        ];
+
+        // Create permissions for departures
+        $departurePermissions = [
             'view departures',
             'create departures',
             'edit departures',
             'delete departures',
-            
-            // Announcement permissions
-            'view announcements',
-            'create announcements',
-            'edit announcements',
-            'delete announcements',
-            
-            // Advertisement permissions
+            'update departure status',
+        ];
+
+        // Create permissions for buses
+        $busPermissions = [
+            'view buses',
+            'create buses',
+            'edit buses',
+            'delete buses',
+        ];
+
+        // Create permissions for advertisements
+        $advertisementPermissions = [
             'view advertisements',
             'create advertisements',
             'edit advertisements',
             'delete advertisements',
-            
-            // Settings permissions
-            'view settings',
-            'edit settings'
         ];
 
-        foreach ($permissions as $permission) {
-            Permission::create(['name' => $permission]);
+        // Create permissions for announcements
+        $announcementPermissions = [
+            'view announcements',
+            'create announcements',
+            'edit announcements',
+            'delete announcements',
+            'toggle announcements',
+        ];
+
+        // Create permissions for reservations
+        $reservationPermissions = [
+            'view reservations',
+            'create reservations',
+            'edit reservations',
+            'delete reservations',
+            'confirm reservations',
+            'cancel reservations',
+        ];
+
+        // Combine all permissions
+        $allPermissions = array_merge(
+            $userPermissions,
+            $rolePermissions,
+            $departurePermissions,
+            $busPermissions,
+            $advertisementPermissions,
+            $announcementPermissions,
+            $reservationPermissions
+        );
+
+        // Create or update permissions
+        foreach ($allPermissions as $permission) {
+            Permission::firstOrCreate(['name' => $permission]);
         }
 
         // Create roles and assign permissions
-        $role = Role::create(['name' => 'super-admin']);
-        $role->givePermissionTo(Permission::all());
+        $roles = [
+            'Super Admin' => $allPermissions,
+            'Admin' => array_merge(
+                $departurePermissions,
+                $busPermissions,
+                $advertisementPermissions,
+                $announcementPermissions,
+                $reservationPermissions
+            ),
+            'Manager' => array_merge(
+                ['view users'],
+                $departurePermissions,
+                $busPermissions,
+                $reservationPermissions
+            ),
+            'Agent' => array_merge(
+                ['view departures', 'view buses'],
+                $reservationPermissions
+            ),
+            'User' => [
+                'view departures',
+                'view buses',
+                'view advertisements',
+                'view announcements',
+                'create reservations',
+                'view reservations',
+            ],
+        ];
 
-        $role = Role::create(['name' => 'admin']);
-        $role->givePermissionTo([
-            'view users', 'create users', 'edit users',
-            'view roles',
-            'view buses', 'create buses', 'edit buses', 'delete buses',
-            'view departures', 'create departures', 'edit departures', 'delete departures',
-            'view announcements', 'create announcements', 'edit announcements', 'delete announcements',
-            'view advertisements', 'create advertisements', 'edit advertisements', 'delete advertisements',
-            'view settings', 'edit settings'
-        ]);
-
-        $role = Role::create(['name' => 'manager']);
-        $role->givePermissionTo([
-            'view buses', 'edit buses',
-            'view departures', 'create departures', 'edit departures',
-            'view announcements', 'create announcements', 'edit announcements',
-            'view advertisements', 'create advertisements', 'edit advertisements',
-            'view settings'
-        ]);
-
-        $role = Role::create(['name' => 'editor']);
-        $role->givePermissionTo([
-            'view buses',
-            'view departures',
-            'view announcements', 'create announcements', 'edit announcements',
-            'view advertisements', 'create advertisements', 'edit advertisements'
-        ]);
+        foreach ($roles as $roleName => $permissions) {
+            $role = Role::firstOrCreate(['name' => $roleName]);
+            $role->syncPermissions($permissions);
+        }
     }
 }

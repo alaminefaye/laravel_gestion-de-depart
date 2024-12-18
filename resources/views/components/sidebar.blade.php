@@ -33,6 +33,12 @@
             <span class="ml-3">Bus</span>
         </a>
 
+        <a href="{{ route('dashboard.reservations.index') }}" 
+           class="flex items-center px-4 py-3 text-white hover:bg-blue-800 transition-colors {{ request()->routeIs('dashboard.reservations.*') ? 'bg-blue-800' : '' }}">
+            <i class="fas fa-ticket-alt w-6"></i>
+            <span class="ml-3">Réservations</span>
+        </a>
+
         <a href="{{ route('dashboard.advertisements.index') }}" 
            class="flex items-center px-4 py-3 text-white hover:bg-blue-800 transition-colors {{ request()->routeIs('dashboard.advertisements.*') ? 'bg-blue-800' : '' }}">
             <i class="fas fa-ad w-6"></i>
@@ -66,6 +72,12 @@
             <i class="fas fa-cog w-6"></i>
             <span class="ml-3">Paramètres</span>
         </a>
+        <a href="{{ route('dashboard.profile.edit') }}" 
+   class="flex items-center px-4 py-3 text-white hover:bg-blue-800 transition-colors {{ request()->routeIs('dashboard.profile.*') ? 'bg-blue-800' : '' }}">
+    <i class="fas fa-user w-6"></i>
+    <span class="ml-3">Mon Profil</span>
+</a>
+
             <!-- Bouton de déconnexion -->
     <div class="absolute bottom-0 left-0 w-full p-4 border-t border-blue-800">
         <form method="POST" action="{{ route('logout') }}" class="w-full">

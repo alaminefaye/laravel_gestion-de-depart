@@ -10,12 +10,14 @@ return new class extends Migration
     {
         Schema::create('reservations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained();
             $table->foreignId('departure_id')->constrained()->onDelete('cascade');
             $table->string('reference')->unique();
+            $table->string('nom_client');
+            $table->string('email');
             $table->integer('nombre_places');
             $table->decimal('prix_total', 10, 2);
-            $table->enum('statut', ['confirmé', 'en_attente', 'annulé'])->default('en_attente');
+            $table->json('siege_numeros')->nullable();
+            $table->enum('statut', ['en_attente', 'confirmé', 'annulé'])->default('en_attente');
             $table->timestamps();
         });
     }

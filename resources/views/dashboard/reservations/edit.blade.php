@@ -66,8 +66,7 @@
                         <label class="block text-sm font-medium text-gray-700 mb-2">Départ</label>
                         <p class="text-gray-900">{{ $reservation->departure->route }}</p>
                         <p class="text-gray-600 text-sm">
-                            {{ $reservation->departure->scheduled_date->format('d/m/Y') }}
-                            à {{ $reservation->departure->scheduled_time->format('H:i') }}
+                            {{ $reservation->departure->scheduled_time->format('d/m/Y à H:i') }}
                         </p>
                     </div>
 

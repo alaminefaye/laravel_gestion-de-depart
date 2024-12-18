@@ -9,7 +9,7 @@ class AnnouncementController extends Controller
 {
     public function index()
     {
-        $announcements = Announcement::all();
+        $announcements = Announcement::latest()->paginate(10);
         return view('dashboard.announcements.index', compact('announcements'));
     }
 

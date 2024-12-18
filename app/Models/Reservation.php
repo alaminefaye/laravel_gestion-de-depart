@@ -13,21 +13,29 @@ class Reservation extends Model
         'departure_id',
         'nom_client',
         'email',
-        'telephone',
         'nombre_places',
-        'statut', // Confirmé, En attente, Annulé
-        'reference',
-        'montant_total'
+        'prix_total',
+        'statut',
+        'siege_numeros',
+        'user_id',
+        'reference'
     ];
 
     protected $casts = [
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
+        'prix_total' => 'decimal:2',
+        'siege_numeros' => 'json'
     ];
 
     public function departure()
     {
         return $this->belongsTo(Departure::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 
     public static function boot()

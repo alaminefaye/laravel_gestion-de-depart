@@ -87,21 +87,33 @@ class DatabaseSeeder extends Seeder
 
         // Création des réservations
         Reservation::create([
-            'user_id' => 1,
             'departure_id' => $departure1->id,
-            'reference' => 'RES-' . strtoupper(Str::random(12)),
+            'nom_client' => 'Jean Dupont',
+            'email' => 'jean.dupont@example.com',
             'nombre_places' => 2,
             'statut' => 'confirmé',
             'prix_total' => 100.00,
+            'siege_numeros' => json_encode([1, 2])
         ]);
 
         Reservation::create([
-            'user_id' => 1,
             'departure_id' => $departure2->id,
-            'reference' => 'RES-' . strtoupper(Str::random(12)),
+            'nom_client' => 'Marie Martin',
+            'email' => 'marie.martin@example.com',
             'nombre_places' => 1,
             'statut' => 'confirmé',
             'prix_total' => 40.00,
+            'siege_numeros' => json_encode([5])
+        ]);
+
+        Reservation::create([
+            'departure_id' => $departure3->id,
+            'nom_client' => 'Pierre Durand',
+            'email' => 'pierre.durand@example.com',
+            'nombre_places' => 3,
+            'statut' => 'en_attente',
+            'prix_total' => 105.00,
+            'siege_numeros' => json_encode([10, 11, 12])
         ]);
     }
 }

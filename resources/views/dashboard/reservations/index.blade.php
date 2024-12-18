@@ -5,6 +5,9 @@
     <div class="bg-white rounded-lg shadow-lg p-6">
         <div class="flex justify-between items-center mb-6">
             <h2 class="text-2xl font-bold text-gray-800">Gestion des Réservations</h2>
+            <a href="{{ route('dashboard.reservations.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                <i class="fas fa-plus mr-2"></i>Nouvelle Réservation
+            </a>
         </div>
 
         @if(session('success'))
@@ -88,7 +91,7 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm text-gray-900">{{ $reservation->departure->route }}</div>
-                                <div class="text-sm text-gray-500">{{ $reservation->departure->scheduled_date->format('d/m/Y') }}</div>
+                                <div class="text-sm text-gray-500">{{ $reservation->departure->scheduled_time ? $reservation->departure->scheduled_time->format('d/m/Y') : 'Non planifié' }}</div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                 {{ $reservation->nombre_places }}

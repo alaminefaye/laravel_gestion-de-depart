@@ -77,8 +77,7 @@
                     <div class="bg-white rounded-lg p-4 shadow">
                         <p class="text-sm text-gray-600">Date et heure de départ</p>
                         <p class="text-lg font-semibold text-gray-900">
-                            {{ $reservation->departure->scheduled_date->format('d/m/Y') }}
-                            à {{ $reservation->departure->scheduled_time->format('H:i') }}
+                            {{ $reservation->departure->scheduled_time->format('d/m/Y à H:i') }}
                         </p>
                     </div>
                     <div class="bg-white rounded-lg p-4 shadow">

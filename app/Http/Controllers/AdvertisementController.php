@@ -10,7 +10,7 @@ class AdvertisementController extends Controller
 {
     public function index()
     {
-        $advertisements = Advertisement::orderBy('display_order')->paginate(10);
+        $advertisements = Advertisement::latest()->paginate(10);
         return view('dashboard.advertisements.index', compact('advertisements'));
     }
 

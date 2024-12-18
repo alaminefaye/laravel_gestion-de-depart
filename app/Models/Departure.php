@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\Bus;
+use App\Models\Reservation;
 use Carbon\Carbon;
 
 class Departure extends Model
@@ -48,6 +49,11 @@ class Departure extends Model
     public function bus()
     {
         return $this->belongsTo(Bus::class);
+    }
+
+    public function reservations()
+    {
+        return $this->hasMany(Reservation::class);
     }
 
     public function getStatusLabelAttribute()

@@ -12,30 +12,27 @@ class DepartureController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Departure::with('bus');
+        $query = Departure::with(['bus']);
 
-        // Appliquer les filtres
         if ($request->filled('search')) {
-            $query->where('route', 'like', '%' . $request->search . '%');
-        }
-
-        if ($request->filled('date_start')) {
-            $query->whereDate('scheduled_time', '>=', $request->date_start);
-        }
-
-        if ($request->filled('date_end')) {
-            $query->whereDate('scheduled_time', '<=', $request->date_end);
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('route', 'like', "%{$search}%")
+                  ->orWhereHas('bus', function($q) use ($search) {
+                      $q->where('numero', 'like', "%{$search}%");
+                  });
+            });
         }
 
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 
-        if ($request->filled('bus_id')) {
-            $query->where('bus_id', $request->bus_id);
+        if ($request->filled('date')) {
+            $query->whereDate('scheduled_time', $request->date);
         }
 
-        $departures = $query->latest()->paginate(10)->withQueryString();
+        $departures = $query->latest()->paginate(10);
         
         $stats = [
             'total_departures' => Departure::count(),

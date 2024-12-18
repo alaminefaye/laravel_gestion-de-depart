@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\SiteSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
 
 class SettingController extends Controller
 {
@@ -30,12 +32,9 @@ class SettingController extends Controller
         ]);
 
         if ($request->hasFile('logo')) {
-            // Supprimer l'ancien logo s'il existe
             if ($settings->logo_path) {
                 Storage::delete('public/' . $settings->logo_path);
             }
-
-            // Stocker le nouveau logo
             $logoPath = $request->file('logo')->store('logos', 'public');
             $settings->logo_path = $logoPath;
         }
@@ -49,5 +48,40 @@ class SettingController extends Controller
         $settings->save();
 
         return redirect()->route('dashboard.settings')->with('success', 'Paramètres mis à jour avec succès');
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $user = auth()->user();
+        
+        $validated = $request->validate([
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'current_password' => 'required_with:new_password',
+            'new_password' => ['nullable', 'required_with:current_password', Password::defaults()],
+            'password_confirmation' => 'required_with:new_password|same:new_password'
+        ]);
+
+        // Vérifier le mot de passe actuel si un nouveau mot de passe est fourni
+        if ($request->filled('current_password')) {
+            if (!Hash::check($request->current_password, $user->password)) {
+                return back()
+                    ->withErrors(['current_password' => 'Le mot de passe actuel est incorrect.'])
+                    ->withInput();
+            }
+        }
+
+        // Mettre à jour l'email
+        $user->email = $validated['email'];
+
+        // Mettre à jour le mot de passe si fourni
+        if ($request->filled('new_password')) {
+            $user->password = Hash::make($validated['new_password']);
+        }
+
+        $user->save();
+
+        return redirect()
+            ->route('dashboard.settings')
+            ->with('success', 'Profil mis à jour avec succès');
     }
 }

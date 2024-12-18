@@ -58,11 +58,11 @@
                             </div>
                         @endif
                     @endif
-                    <div class="p-4 bg-gradient-to-r from-blue-600 to-blue-800 text-white">
+                    <!-- <div class="p-4 bg-gradient-to-r from-blue-600 to-blue-800 text-white">
                         <h3 class="text-xl font-semibold">
                             <i class="fas fa-star mr-2"></i>{{ $advertisement->title }}
                         </h3>
-                    </div>
+                    </div> -->
                 </div>
             @endforeach
         @else
