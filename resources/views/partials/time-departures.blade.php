@@ -1,75 +1,72 @@
 <!-- Time and Departures -->
-<div class="space-y-4">
+<div class="space-y-6">
     <!-- Current Time -->
-    <div class="bg-white rounded-lg shadow p-4 hover-up">
-        <h2 class="flex items-center text-2xl font-semibold text-gray-800 mb-3">
-            <i class="fas fa-clock mr-2 text-blue-600"></i>
+    <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
+        <h2 class="flex items-center text-2xl font-bold text-gray-800 mb-4">
+            <i class="fas fa-clock mr-3 text-blue-600"></i>
             Heure Actuelle
         </h2>
-        <div class="text-5xl font-bold text-blue-600 text-center" id="current-time"></div>
-        <div class="text-lg text-gray-600 text-center mt-1" id="current-date"></div>
+        <div class="text-6xl font-bold text-blue-600 text-center tracking-tight" id="current-time"></div>
+        <div class="text-xl text-gray-600 text-center mt-2 font-medium" id="current-date"></div>
     </div>
 
     <!-- Departures -->
-    <div class="bg-white rounded-lg shadow p-4 hover-up">
-        <h2 class="flex items-center text-2xl font-semibold text-gray-800 mb-3">
-            <i class="fas fa-calendar-alt mr-2 text-blue-600"></i>
+    <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
+        <h2 class="flex items-center text-2xl font-bold text-gray-800 mb-4">
+            <i class="fas fa-bus mr-3 text-blue-600"></i>
             Horaires de Départ
         </h2>
         @if(count($departures) > 0)
             @php
                 $statusClasses = [
-                    App\Models\Departure::STATUS_ON_TIME => 'bg-green-100 text-green-800',
-                    App\Models\Departure::STATUS_DELAYED => 'bg-yellow-100 text-yellow-800',
-                    App\Models\Departure::STATUS_CANCELLED => 'bg-red-100 text-red-800',
+                    'À l\'heure' => 'bg-green-100 text-green-800 border border-green-200',
+                    'En retard' => 'bg-yellow-100 text-yellow-800 border border-yellow-200',
+                    'Annulé' => 'bg-red-100 text-red-800 border border-red-200',
                 ];
             @endphp
             <div class="overflow-x-auto">
-                <table class="min-w-full bg-white">
-                    <thead class="bg-gray-800 text-white">
-                        <tr>
-                            <th class="py-2 px-4 border">Route</th>
-                            <th class="py-2 px-4 border">Heure prévue</th>
-                            <th class="py-2 px-4 border">Heure retardée</th>
-                            <th class="py-2 px-4 border">Statut</th>
-                            <th class="py-2 px-4 border">Bus</th>
-                            <th class="py-2 px-4 border">Places</th>
-                            <th class="py-2 px-4 border">Prix</th>
-                            <th class="py-2 px-4 border">Actions</th>
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead>
+                        <tr class="bg-gray-50">
+                            <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">Route</th>
+                            <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">Départ Prévu</th>
+                            <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">Heure Retardée</th>
+                            <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">Statut</th>
+                            <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">Bus</th>
+                            <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">Places</th>
+                            <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">Prix</th>
                         </tr>
                     </thead>
-                    <tbody class="text-gray-700">
+                    <tbody class="bg-white divide-y divide-gray-200">
                         @foreach($departures as $departure)
-                            <tr>
-                                <td class="py-2 px-4 border">{{ $departure->route }}</td>
-                                <td class="py-2 px-4 border">{{ $departure->formatted_scheduled_time }}</td>
-                                <td class="py-2 px-4 border">
-                                    @if($departure->status === App\Models\Departure::STATUS_DELAYED && $departure->delayed_time)
-                                        {{ $departure->formatted_delayed_time }}
-                                    @else
-                                        --:--
-                                    @endif
+                            <tr class="hover:bg-gray-50 transition-colors duration-200">
+                                <td class="px-6 py-4">
+                                    <div class="text-sm font-bold text-gray-900">{{ $departure->route }}</div>
                                 </td>
-                                <td class="py-2 px-4 border">
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $statusClasses[$departure->status] ?? 'bg-gray-100 text-gray-800' }}">
+                                <td class="px-6 py-4">
+                                    <div class="text-sm font-bold text-gray-900">{{ $departure->formatted_scheduled_time }}</div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="text-sm font-bold text-red-600">{{ $departure->formatted_delayed_time ?: '-' }}</div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="px-3 py-1 text-sm font-bold rounded-full {{ $statusClasses[$departure->status_label] }}">
                                         {{ $departure->status_label }}
                                     </span>
                                 </td>
-                                <td class="py-2 px-4 border">{{ optional($departure->bus)->name ?? '--' }}</td>
-                                <td class="py-2 px-4 border">{{ $departure->places_disponibles }}</td>
-                                <td class="py-2 px-4 border">{{ number_format($departure->prix, 2, ',', ' ') }} €</td>
-                                <td class="py-2 px-4 border">
-                                    <div class="flex space-x-2">
-                                        <a href="{{ route('dashboard.departures.edit', $departure) }}" class="text-blue-600 hover:text-blue-800">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        <form action="{{ route('dashboard.departures.destroy', $departure) }}" method="POST" class="inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="text-red-600 hover:text-red-800" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce départ ?')">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </form>
+                                <td class="px-6 py-4">
+                                    <div class="text-sm font-bold text-gray-900">N°{{ $departure->bus->numero }}</div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="text-sm text-gray-900">
+                                        <span class="font-bold">{{ $departure->places_disponibles }}</span>
+                                        <span class="text-gray-500 font-bold">places</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="text-sm text-gray-900">
+                                        <span class="font-bold">{{ number_format($departure->prix, 0, ',', ' ') }}</span>
+                                        <span class="text-gray-500 font-bold">CFA</span>
                                     </div>
                                 </td>
                             </tr>
@@ -78,8 +75,8 @@
                 </table>
             </div>
         @else
-            <div class="text-center py-4">
-                <p class="text-lg text-gray-500">Aucun départ n'est programmé.</p>
+            <div class="text-center py-8">
+                <div class="text-gray-500 text-lg">Aucun départ disponible pour le moment</div>
             </div>
         @endif
     </div>
@@ -92,18 +89,14 @@
         const timeElement = document.getElementById('current-time');
         const dateElement = document.getElementById('current-date');
         
-        // Format time
-        const hours = String(now.getHours()).padStart(2, '0');
-        const minutes = String(now.getMinutes()).padStart(2, '0');
-        timeElement.textContent = `${hours}:${minutes}`;
+        const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+        const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         
-        // Format date
-        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-        dateElement.textContent = now.toLocaleDateString('fr-FR', options);
+        timeElement.textContent = now.toLocaleTimeString('fr-FR', timeOptions);
+        dateElement.textContent = now.toLocaleDateString('fr-FR', dateOptions);
     }
 
-    // Update time immediately and then every minute
     updateTime();
-    setInterval(updateTime, 60000);
+    setInterval(updateTime, 1000);
 </script>
 @endpush

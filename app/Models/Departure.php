@@ -5,16 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\Bus;
-use App\Models\Reservation;
 use Carbon\Carbon;
 
 class Departure extends Model
 {
     use HasFactory;
 
-    const STATUS_ON_TIME = '1';
-    const STATUS_DELAYED = '2';
-    const STATUS_CANCELLED = '3';
+    public const STATUS_ON_TIME = 1;
+    public const STATUS_DELAYED = 2;
+    public const STATUS_CANCELLED = 3;
 
     protected $fillable = [
         'route',
@@ -23,14 +22,13 @@ class Departure extends Model
         'status',
         'bus_id',
         'prix',
-        'places_disponibles',
-        'taux_occupation'
+        'places_disponibles'
     ];
 
     protected $casts = [
         'scheduled_time' => 'datetime',
         'delayed_time' => 'datetime',
-        'prix' => 'decimal:2'
+        'prix' => 'decimal:0'
     ];
 
     protected $dates = [
@@ -38,82 +36,47 @@ class Departure extends Model
         'delayed_time'
     ];
 
-    protected $attributes = [
-        'status' => self::STATUS_ON_TIME,
-    ];
-
-    public static $statusTranslations = [
-        self::STATUS_ON_TIME => 'À l\'heure',
-        self::STATUS_DELAYED => 'En retard',
-        self::STATUS_CANCELLED => 'Annulé'
-    ];
-
-    public function getStatusLabelAttribute()
-    {
-        return self::$statusTranslations[$this->status] ?? $this->status;
-    }
-
-    public function isDelayed()
-    {
-        return $this->status === self::STATUS_DELAYED;
-    }
-
-    public static function getStatusOptions()
-    {
-        return self::$statusTranslations;
-    }
-
     public function bus()
     {
         return $this->belongsTo(Bus::class);
     }
 
-    public function reservations()
+    public function getStatusLabelAttribute()
     {
-        return $this->hasMany(Reservation::class);
+        return match($this->status) {
+            self::STATUS_ON_TIME => 'À l\'heure',
+            self::STATUS_DELAYED => 'En retard',
+            self::STATUS_CANCELLED => 'Annulé',
+            default => 'Inconnu'
+        };
     }
 
-    public function getPlacesRestantesAttribute()
+    public static function getStatusOptions()
     {
-        return $this->places_disponibles - $this->reservations()->count();
+        return [
+            self::STATUS_ON_TIME => 'À l\'heure',
+            self::STATUS_DELAYED => 'En retard',
+            self::STATUS_CANCELLED => 'Annulé'
+        ];
+    }
+
+    public function setScheduledTimeAttribute($value)
+    {
+        $this->attributes['scheduled_time'] = $value ? Carbon::parse($value) : null;
+    }
+
+    public function setDelayedTimeAttribute($value)
+    {
+        $this->attributes['delayed_time'] = $value ? Carbon::parse($value) : null;
     }
 
     public function getFormattedScheduledTimeAttribute()
     {
-        if (!$this->scheduled_time) {
-            return '';
-        }
-        
-        if (is_string($this->scheduled_time)) {
-            return Carbon::parse($this->scheduled_time)->format('H:i');
-        }
-        
-        return $this->scheduled_time->format('H:i');
+        return $this->scheduled_time ? $this->scheduled_time->format('d/m/Y H:i') : '';
     }
 
     public function getFormattedDelayedTimeAttribute()
     {
-        if (!$this->delayed_time) {
-            return '';
-        }
-        
-        if (is_string($this->delayed_time)) {
-            return Carbon::parse($this->delayed_time)->format('H:i');
-        }
-        
-        return $this->delayed_time->format('H:i');
-    }
-
-    public function getScheduledDateAttribute()
-    {
-        if (!$this->scheduled_time) {
-            return '';
-        }
-        
-        if (is_string($this->scheduled_time)) {
-            return Carbon::parse($this->scheduled_time)->format('Y-m-d');
-        }
-        
-        return $this->scheduled_time->format('Y-m-d');
+        return $this->delayed_time ? $this->delayed_time->format('d/m/Y H:i') : '';
     }
 }

@@ -21,7 +21,7 @@
         </div>
         <div class="bg-white rounded-lg shadow p-4">
             <h3 class="text-sm font-medium text-gray-500">Places Disponibles (Moyenne)</h3>
-            <p class="mt-1 text-2xl font-semibold text-gray-900">{{ $stats['average_places_disponibles'] }}</p>
+            <p class="mt-1 text-2xl font-semibold text-gray-900">{{ $stats['average_places'] }}</p>
         </div>
         <div class="bg-white rounded-lg shadow p-4">
             <h3 class="text-sm font-medium text-gray-500">Départs en Retard</h3>
@@ -55,9 +55,11 @@
                 <select name="status" id="status"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                     <option value="">Tous</option>
-                    <option value="1" {{ request('status') == "1" ? 'selected' : '' }}>À l'heure</option>
-                    <option value="2" {{ request('status') == "2" ? 'selected' : '' }}>En retard</option>
-                    <option value="3" {{ request('status') == "3" ? 'selected' : '' }}>Annulé</option>
+                    @foreach(App\Models\Departure::getStatusOptions() as $value => $label)
+                        <option value="{{ $value }}" {{ request('status') == $value ? 'selected' : '' }}>
+                            {{ $label }}
+                        </option>
+                    @endforeach
                 </select>
             </div>
 
@@ -93,55 +95,75 @@
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
                 <tr>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Route</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Départ prévu</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Heure retardée</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bus</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Places</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Prix</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Route
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Bus
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Date de départ
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Date de retard
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Statut
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Prix
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Places
+                    </th>
+                    <th scope="col" class="relative px-6 py-3">
+                        <span class="sr-only">Actions</span>
+                    </th>
                 </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
-                @foreach ($departures as $departure)
-                    <tr>
-                        <td class="px-6 py-4 whitespace-nowrap">{{ $departure->route }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">{{ $departure->formatted_scheduled_time }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            @if($departure->status === '2' && $departure->delayed_time)
-                                {{ $departure->formatted_delayed_time }}
-                            @else
-                                <span class="text-gray-400">-</span>
-                            @endif
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">{{ optional($departure->bus)->numero }} - {{ optional($departure->bus)->modele }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">{{ $departure->places_disponibles }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">{{ number_format($departure->prix, 0, ',', ' ') }} CFA</td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                @if($departure->status === '1') bg-green-100 text-green-800
-                                @elseif($departure->status === '2') bg-yellow-100 text-yellow-800
-                                @else bg-red-100 text-red-800
-                                @endif">
-                                {{ $departure->status_label }}
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <div class="flex space-x-2">
-                                <a href="{{ route('dashboard.departures.edit', $departure) }}" class="text-blue-600 hover:text-blue-900">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <form action="{{ route('dashboard.departures.destroy', $departure) }}" method="POST" class="inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="text-red-600 hover:text-red-900" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce départ ?')">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
+                @foreach($departures as $departure)
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        {{ $departure->route }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        Bus N°{{ $departure->bus->numero }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        {{ $departure->formatted_scheduled_time }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        {{ $departure->formatted_delayed_time ?: '-' }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                            @if($departure->status === App\Models\Departure::STATUS_ON_TIME) bg-green-100 text-green-800
+                            @elseif($departure->status === App\Models\Departure::STATUS_DELAYED) bg-yellow-100 text-yellow-800
+                            @elseif($departure->status === App\Models\Departure::STATUS_CANCELLED) bg-red-100 text-red-800
+                            @endif">
+                            {{ $departure->status_label }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        {{ number_format($departure->prix, 0, ',', ' ') }} CFA
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        {{ $departure->places_disponibles }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <a href="{{ route('dashboard.departures.edit', $departure) }}" class="text-blue-600 hover:text-blue-900 mr-3">
+                            Modifier
+                        </a>
+                        <form action="{{ route('dashboard.departures.destroy', $departure) }}" method="POST" class="inline">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="text-red-600 hover:text-red-900" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce départ ?')">
+                                Supprimer
+                            </button>
+                        </form>
+                    </td>
+                </tr>
                 @endforeach
             </tbody>
         </table>

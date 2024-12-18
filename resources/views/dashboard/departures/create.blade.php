@@ -52,13 +52,13 @@
                 </div>
 
                 <div>
-                    <label for="scheduled_date" class="block text-sm font-medium text-gray-700">Date de départ</label>
-                    <input type="date" name="scheduled_date" id="scheduled_date" value="{{ old('scheduled_date') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" required>
+                    <label for="scheduled_time" class="block text-sm font-medium text-gray-700">Date et heure de départ</label>
+                    <input type="datetime-local" name="scheduled_time" id="scheduled_time" value="{{ old('scheduled_time') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" required>
                 </div>
 
                 <div>
-                    <label for="scheduled_time" class="block text-sm font-medium text-gray-700">Heure de départ</label>
-                    <input type="time" name="scheduled_time" id="scheduled_time" value="{{ old('scheduled_time') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" required>
+                    <label for="delayed_time" class="block text-sm font-medium text-gray-700">Date et heure de retard (optionnel)</label>
+                    <input type="datetime-local" name="delayed_time" id="delayed_time" value="{{ old('delayed_time') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                 </div>
 
                 <div>
@@ -72,8 +72,14 @@
                 </div>
 
                 <div>
+                    <label for="places_disponibles" class="block text-sm font-medium text-gray-700">Places disponibles</label>
+                    <input type="number" name="places_disponibles" id="places_disponibles" min="0" value="{{ old('places_disponibles') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" required>
+                </div>
+
+                <div>
                     <label for="status" class="block text-sm font-medium text-gray-700">Statut</label>
                     <select name="status" id="status" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" required>
+                        <option value="">Sélectionner un statut</option>
                         @foreach(App\Models\Departure::getStatusOptions() as $value => $label)
                             <option value="{{ $value }}" {{ old('status') == $value ? 'selected' : '' }}>
                                 {{ $label }}
@@ -81,32 +87,10 @@
                         @endforeach
                     </select>
                 </div>
-
-                <div id="delayed_time_container" style="display: none;">
-                    <label for="delayed_time" class="block text-sm font-medium text-gray-700">Heure retardée</label>
-                    <input type="time" name="delayed_time" id="delayed_time" 
-                           value="{{ old('delayed_time') }}"
-                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                </div>
-
-                <div>
-                    <label for="places_disponibles" class="block text-sm font-medium text-gray-700">Nombre de places disponibles</label>
-                    <div class="mt-1 relative rounded-md shadow-sm">
-                        <input type="number" name="places_disponibles" id="places_disponibles" 
-                               min="0" 
-                               value="{{ old('places_disponibles', 0) }}" 
-                               class="block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500" 
-                               required>
-                        <div class="mt-1 text-sm text-gray-500" id="max-places"></div>
-                    </div>
-                </div>
             </div>
 
-            <div class="flex justify-end space-x-4">
-                <button type="button" onclick="window.history.back()" class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                    Annuler
-                </button>
-                <button type="submit" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            <div class="flex justify-end mt-6">
+                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                     Créer le départ
                 </button>
             </div>
@@ -114,45 +98,3 @@
     </div>
 </div>
 @endsection
-
-@push('scripts')
-<script>
-document.getElementById('bus_id').addEventListener('change', function() {
-    const selectedOption = this.options[this.selectedIndex];
-    const capacite = selectedOption.textContent.match(/\((\d+) places\)/)?.[1] || 0;
-    const placesInput = document.getElementById('places_disponibles');
-    placesInput.max = capacite;
-    document.getElementById('max-places').textContent = `Maximum: ${capacite} places`;
-});
-
-// Set initial max places if a bus is already selected
-document.addEventListener('DOMContentLoaded', function() {
-    const busSelect = document.getElementById('bus_id');
-    if (busSelect.value) {
-        busSelect.dispatchEvent(new Event('change'));
-    }
-});
-
-document.addEventListener('DOMContentLoaded', function() {
-    const statusSelect = document.getElementById('status');
-    const delayedTimeContainer = document.getElementById('delayed_time_container');
-    const delayedTimeInput = document.getElementById('delayed_time');
-
-    function toggleDelayedTime() {
-        const isDelayed = statusSelect.value === '{{ App\Models\Departure::STATUS_DELAYED }}';
-        delayedTimeContainer.style.display = isDelayed ? 'block' : 'none';
-        delayedTimeInput.required = isDelayed;
-        
-        if (!isDelayed) {
-            delayedTimeInput.value = '';
-        }
-    }
-
-    // Set initial state
-    toggleDelayedTime();
-
-    // Listen for changes
-    statusSelect.addEventListener('change', toggleDelayedTime);
-});
-</script>
-@endpush

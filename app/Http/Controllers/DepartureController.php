@@ -6,7 +6,6 @@ use App\Models\Bus;
 use App\Models\Departure;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class DepartureController extends Controller
@@ -15,54 +14,39 @@ class DepartureController extends Controller
     {
         $query = Departure::with('bus');
 
-        // Search by route
+        // Appliquer les filtres
         if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where('route', 'like', "%{$search}%");
+            $query->where('route', 'like', '%' . $request->search . '%');
         }
 
-        // Filter by date range
         if ($request->filled('date_start')) {
-            $query->whereDate('scheduled_time', '>=', Carbon::parse($request->date_start)->startOfDay());
-        }
-        if ($request->filled('date_end')) {
-            $query->whereDate('scheduled_time', '<=', Carbon::parse($request->date_end)->endOfDay());
+            $query->whereDate('scheduled_time', '>=', $request->date_start);
         }
 
-        // Filter by status
+        if ($request->filled('date_end')) {
+            $query->whereDate('scheduled_time', '<=', $request->date_end);
+        }
+
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 
-        // Filter by bus
         if ($request->filled('bus_id')) {
             $query->where('bus_id', $request->bus_id);
         }
 
-        // Filter by occupation rate
-        if ($request->filled('places_min')) {
-            $query->where('places_disponibles', '>=', $request->places_min);
-        }
-        if ($request->filled('places_max')) {
-            $query->where('places_disponibles', '<=', $request->places_max);
-        }
-
-        // Sort
-        $sortField = $request->input('sort', 'scheduled_time');
-        $sortDirection = $request->input('direction', 'asc');
-        $query->orderBy($sortField, $sortDirection);
-
-        $departures = $query->paginate(10)->withQueryString();
-
-        $buses = Bus::all();
+        $departures = $query->latest()->paginate(10)->withQueryString();
+        
         $stats = [
             'total_departures' => Departure::count(),
             'departures_today' => Departure::whereDate('scheduled_time', Carbon::today())->count(),
-            'average_places_disponibles' => round(Departure::avg('places_disponibles'), 1),
-            'delayed_count' => Departure::where('status', 'En retard')->count()
+            'average_places' => round(Departure::avg('places_disponibles'), 0),
+            'delayed_count' => Departure::where('status', Departure::STATUS_DELAYED)->count()
         ];
 
-        return view('dashboard.departures.index', compact('departures', 'buses', 'stats'));
+        $buses = Bus::all();
+
+        return view('dashboard.departures.index', compact('departures', 'stats', 'buses'));
     }
 
     public function create()
@@ -75,29 +59,45 @@ class DepartureController extends Controller
     {
         $validatedData = $request->validate([
             'route' => 'required|string|max:255',
-            'scheduled_time' => 'required',
-            'delayed_time' => 'nullable',
-            'status' => 'required|string',
+            'scheduled_time' => 'required|date',
+            'delayed_time' => 'nullable|date|after_or_equal:scheduled_time',
+            'status' => 'required|integer|in:1,2,3',
             'bus_id' => 'required|exists:buses,id',
-            'prix' => 'required|numeric',
-            'places_disponibles' => 'required|integer',
+            'prix' => 'required|numeric|min:0',
+            'places_disponibles' => 'required|integer|min:0',
         ]);
 
         try {
-            // Convertir les temps en objets Carbon
-            if (!empty($validatedData['scheduled_time'])) {
-                $validatedData['scheduled_time'] = Carbon::parse($validatedData['scheduled_time']);
-            }
-            
-            if (!empty($validatedData['delayed_time'])) {
-                $validatedData['delayed_time'] = Carbon::parse($validatedData['delayed_time']);
+            Log::info('Création d\'un départ', [
+                'data' => $validatedData,
+                'request' => $request->all()
+            ]);
+
+            // Si le statut est "En retard" et qu'il n'y a pas de delayed_time, on utilise scheduled_time + 1 heure
+            if ($validatedData['status'] == Departure::STATUS_DELAYED) {
+                if (empty($validatedData['delayed_time'])) {
+                    $scheduledTime = Carbon::parse($validatedData['scheduled_time']);
+                    $validatedData['delayed_time'] = $scheduledTime->addHour();
+                }
+            } else {
+                $validatedData['delayed_time'] = null;
             }
 
             $departure = Departure::create($validatedData);
-            
+
+            Log::info('Départ créé avec succès', [
+                'departure_id' => $departure->id,
+                'data' => $departure->toArray()
+            ]);
+
             return redirect()->route('dashboard.departures.index')
                 ->with('success', 'Départ créé avec succès.');
         } catch (\Exception $e) {
+            Log::error('Erreur lors de la création du départ', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
             return redirect()->back()
                 ->withInput()
                 ->with('error', 'Erreur lors de la création du départ : ' . $e->getMessage());
@@ -106,68 +106,58 @@ class DepartureController extends Controller
 
     public function edit(Departure $departure)
     {
-        try {
-            $buses = Bus::all();
-            return view('dashboard.departures.edit', compact('departure', 'buses'));
-        } catch (\Exception $e) {
-            return redirect()->route('dashboard.departures.index')
-                ->with('error', 'Erreur lors du chargement du départ : ' . $e->getMessage());
-        }
+        $buses = Bus::all();
+        return view('dashboard.departures.edit', compact('departure', 'buses'));
     }
 
     public function update(Request $request, Departure $departure)
     {
         $validatedData = $request->validate([
             'route' => 'required|string|max:255',
-            'scheduled_time' => 'required',
-            'delayed_time' => 'nullable',
-            'status' => 'required|string',
+            'scheduled_time' => 'required|date',
+            'delayed_time' => 'nullable|date|after_or_equal:scheduled_time',
+            'status' => 'required|in:'.Departure::STATUS_ON_TIME.','.Departure::STATUS_DELAYED.','.Departure::STATUS_CANCELLED,
             'bus_id' => 'required|exists:buses,id',
-            'prix' => 'required|numeric',
-            'places_disponibles' => 'required|integer',
+            'prix' => 'required|numeric|min:0',
+            'places_disponibles' => 'required|integer|min:0',
         ]);
 
         try {
-            // Convertir les temps en objets Carbon
-            if (!empty($validatedData['scheduled_time'])) {
-                $validatedData['scheduled_time'] = Carbon::parse($validatedData['scheduled_time']);
-            }
-            
-            if (!empty($validatedData['delayed_time'])) {
-                $validatedData['delayed_time'] = Carbon::parse($validatedData['delayed_time']);
+            Log::info('Mise à jour d\'un départ', [
+                'departure_id' => $departure->id,
+                'old_data' => $departure->toArray(),
+                'new_data' => $validatedData,
+                'request' => $request->all()
+            ]);
+
+            // Si le statut est "En retard" et qu'il n'y a pas de delayed_time, on utilise scheduled_time + 1 heure
+            if ($validatedData['status'] == Departure::STATUS_DELAYED) {
+                if (empty($validatedData['delayed_time'])) {
+                    $scheduledTime = Carbon::parse($validatedData['scheduled_time']);
+                    $validatedData['delayed_time'] = $scheduledTime->addHour();
+                }
+            } else {
+                $validatedData['delayed_time'] = null;
             }
 
             $departure->update($validatedData);
-            
+
+            Log::info('Départ mis à jour avec succès', [
+                'departure_id' => $departure->id,
+                'data' => $departure->fresh()->toArray()
+            ]);
+
             return redirect()->route('dashboard.departures.index')
                 ->with('success', 'Départ mis à jour avec succès.');
         } catch (\Exception $e) {
+            Log::error('Erreur lors de la mise à jour du départ', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
             return redirect()->back()
                 ->withInput()
                 ->with('error', 'Erreur lors de la mise à jour du départ : ' . $e->getMessage());
-        }
-    }
-
-    public function updateStatus(Request $request, Departure $departure)
-    {
-        try {
-            $validated = $request->validate([
-                'status' => 'required|in:1,2,3',
-                'new_time' => 'nullable|date_format:H:i'
-            ]);
-
-            if ($validated['status'] === '2' && $request->filled('new_time')) {
-                $departure->delayed_time = Carbon::parse($request->new_time);
-            } else {
-                $departure->delayed_time = null;
-            }
-
-            $departure->status = $validated['status'];
-            $departure->save();
-
-            return response()->json(['message' => 'Status mis à jour avec succès']);
-        } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
         }
     }
 
@@ -176,21 +166,10 @@ class DepartureController extends Controller
         try {
             $departure->delete();
             return redirect()->route('dashboard.departures.index')
-                ->with('success', 'Départ supprimé avec succès');
+                ->with('success', 'Départ supprimé avec succès.');
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Erreur lors de la suppression du départ : ' . $e->getMessage());
-        }
-    }
-
-    public function show($id)
-    {
-        try {
-            $departure = Departure::with('bus')->findOrFail($id);
-            return view('dashboard.departures.show', compact('departure'));
-        } catch (\Exception $e) {
-            return redirect()->route('dashboard.departures.index')
-                ->with('error', 'Départ non trouvé : ' . $e->getMessage());
+                ->with('error', 'Erreur lors de la suppression du départ.');
         }
     }
 }

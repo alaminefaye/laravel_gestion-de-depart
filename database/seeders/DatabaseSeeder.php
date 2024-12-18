@@ -8,6 +8,7 @@ use App\Models\Departure;
 use App\Models\Reservation;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 use Database\Seeders\AnnouncementSeeder;
 use Database\Seeders\AdminUserSeeder;
 
@@ -26,81 +27,72 @@ class DatabaseSeeder extends Seeder
             'numero' => 'BUS-001',
             'modele' => 'Mercedes Tourismo',
             'capacite' => 50,
+            'annee' => 2020,
             'statut' => 'En service',
-            'derniere_maintenance' => Carbon::now()->subMonths(2),
-            'prochaine_maintenance' => Carbon::now()->addMonths(1),
         ]);
 
         $bus2 = Bus::create([
             'numero' => 'BUS-002',
             'modele' => 'Volvo 9700',
             'capacite' => 45,
+            'annee' => 2021,
             'statut' => 'En service',
-            'derniere_maintenance' => Carbon::now()->subMonths(1),
-            'prochaine_maintenance' => Carbon::now()->addMonths(2),
         ]);
 
         $bus3 = Bus::create([
             'numero' => 'BUS-003',
             'modele' => 'Scania Touring',
             'capacite' => 55,
+            'annee' => 2019,
             'statut' => 'En maintenance',
-            'derniere_maintenance' => Carbon::now()->subMonths(6),
-            'prochaine_maintenance' => Carbon::now(),
         ]);
 
         // Création des départs
         $departure1 = Departure::create([
-            'route' => 'YAKRO-BOUAKE',
-            'scheduled_time' => Carbon::tomorrow()->setHour(8)->setMinute(0),
             'bus_id' => $bus1->id,
+            'route' => 'Paris - Lyon',
+            'scheduled_time' => Carbon::now()->addDays(1),
+            'status' => '1',
+            'prix' => 50.00,
             'places_disponibles' => 50,
-            'prix' => 5000,
-            'status' => 'On time',
-            'taux_occupation' => 0,
         ]);
 
         $departure2 = Departure::create([
-            'route' => 'BOUAKE-YAKRO',
-            'scheduled_time' => Carbon::tomorrow()->setHour(14)->setMinute(0),
             'bus_id' => $bus2->id,
+            'route' => 'Lyon - Marseille',
+            'scheduled_time' => Carbon::now()->addDays(2),
+            'status' => '1',
+            'prix' => 40.00,
             'places_disponibles' => 45,
-            'prix' => 5000,
-            'status' => 'On time',
-            'taux_occupation' => 0,
         ]);
 
         $departure3 = Departure::create([
-            'route' => 'YAKRO-ABIDJAN',
-            'scheduled_time' => Carbon::tomorrow()->setHour(16)->setMinute(0),
             'bus_id' => $bus1->id,
+            'route' => 'Marseille - Nice',
+            'scheduled_time' => Carbon::now()->addDays(3),
+            'status' => '2',
+            'delayed_time' => Carbon::now()->addDays(3)->addHours(1),
+            'prix' => 35.00,
             'places_disponibles' => 50,
-            'prix' => 7000,
-            'status' => 'Delayed',
-            'taux_occupation' => 0,
         ]);
 
         // Création des réservations
-        $reservation1 = Reservation::create([
+        Reservation::create([
+            'user_id' => 1,
             'departure_id' => $departure1->id,
-            'reference' => 'RES-' . strtoupper(uniqid()),
-            'nom_client' => 'John Doe',
-            'email' => 'john@example.com',
-            'telephone' => '0123456789',
+            'reference' => 'RES-' . strtoupper(Str::random(12)),
             'nombre_places' => 2,
-            'montant_total' => 10000,
-            'statut' => 'Confirmé',
+            'statut' => 'confirmé',
+            'prix_total' => 100.00,
         ]);
 
-        $reservation2 = Reservation::create([
+        Reservation::create([
+            'user_id' => 1,
             'departure_id' => $departure2->id,
-            'reference' => 'RES-' . strtoupper(uniqid()),
-            'nom_client' => 'Jane Smith',
-            'email' => 'jane@example.com',
-            'telephone' => '0987654321',
+            'reference' => 'RES-' . strtoupper(Str::random(12)),
             'nombre_places' => 1,
-            'montant_total' => 5000,
-            'statut' => 'Confirmé',
+            'statut' => 'confirmé',
+            'prix_total' => 40.00,
         ]);
 
         // Création des annonces

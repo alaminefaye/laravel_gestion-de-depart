@@ -13,9 +13,8 @@ return new class extends Migration
             $table->string('numero')->unique();
             $table->string('modele');
             $table->integer('capacite');
+            $table->integer('annee');
             $table->enum('statut', ['En service', 'En maintenance', 'Hors service']);
-            $table->timestamp('derniere_maintenance')->nullable();
-            $table->timestamp('prochaine_maintenance')->nullable();
             $table->timestamps();
         });
     }

@@ -34,103 +34,111 @@
             @csrf
             @method('PUT')
 
-            <div>
-                <label for="route" class="block text-sm font-medium text-gray-700">Route</label>
-                <input type="text" name="route" id="route" value="{{ old('route', $departure->route) }}" required
-                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="route" class="block text-sm font-medium text-gray-700">Route</label>
+                    <input type="text" name="route" id="route" value="{{ old('route', $departure->route) }}" 
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" required>
+                </div>
+
+                <div>
+                    <label for="bus_id" class="block text-sm font-medium text-gray-700">Bus</label>
+                    <select name="bus_id" id="bus_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" required>
+                        <option value="">Sélectionner un bus</option>
+                        @foreach($buses as $bus)
+                            <option value="{{ $bus->id }}" {{ old('bus_id', $departure->bus_id) == $bus->id ? 'selected' : '' }}>
+                                Bus N°{{ $bus->numero }} ({{ $bus->capacite }} places)
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div>
+                    <label for="status" class="block text-sm font-medium text-gray-700">Statut</label>
+                    <select name="status" id="status" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" required>
+                        @foreach(App\Models\Departure::getStatusOptions() as $value => $label)
+                            <option value="{{ $value }}" {{ old('status', $departure->status) == $value ? 'selected' : '' }}>
+                                {{ $label }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div>
+                    <label for="prix" class="block text-sm font-medium text-gray-700">Prix</label>
+                    <div class="mt-1 relative rounded-md shadow-sm">
+                        <input type="number" name="prix" id="prix" step="1" min="0" value="{{ old('prix', $departure->prix) }}" 
+                               class="block w-full pr-12 rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-500" required>
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                            <span class="text-gray-500 sm:text-sm">CFA</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label for="places_disponibles" class="block text-sm font-medium text-gray-700">Places disponibles</label>
+                    <input type="number" name="places_disponibles" id="places_disponibles" min="0" 
+                           value="{{ old('places_disponibles', $departure->places_disponibles) }}" 
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" required>
+                </div>
+
+                <div>
+                    <label for="scheduled_time" class="block text-sm font-medium text-gray-700">Date et heure de départ</label>
+                    <input type="datetime-local" name="scheduled_time" id="scheduled_time" 
+                           value="{{ old('scheduled_time', $departure->scheduled_time ? $departure->scheduled_time->format('Y-m-d\TH:i') : '') }}" 
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" required>
+                </div>
+
+                <div id="delayed_time_container">
+                    <label for="delayed_time" class="block text-sm font-medium text-gray-700">Date et heure de retard</label>
+                    <input type="datetime-local" name="delayed_time" id="delayed_time" 
+                           value="{{ old('delayed_time', $departure->delayed_time ? $departure->delayed_time->format('Y-m-d\TH:i') : '') }}" 
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                </div>
             </div>
 
-            <div>
-                <label for="scheduled_date" class="block text-sm font-medium text-gray-700">Date prévue</label>
-                <input type="date" name="scheduled_date" id="scheduled_date" 
-                       value="{{ old('scheduled_date', $departure->scheduled_date ?? '') }}" required
-                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-            </div>
-
-            <div>
-                <label for="scheduled_time" class="block text-sm font-medium text-gray-700">Heure prévue</label>
-                <input type="time" name="scheduled_time" id="scheduled_time" 
-                       value="{{ old('scheduled_time', $departure->scheduled_time ?? '') }}" required
-                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-            </div>
-
-            <div>
-                <label for="status" class="block text-sm font-medium text-gray-700">Statut</label>
-                <select name="status" id="status" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" required>
-                    @foreach(App\Models\Departure::$statusTranslations as $value => $label)
-                        <option value="{{ $value }}" {{ old('status', $departure->status) === $value ? 'selected' : '' }}>
-                            {{ $label }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-
-            <div id="delayed_time_container" class="{{ old('status', $departure->status) !== '2' ? 'hidden' : '' }}">
-                <label for="delayed_time" class="block text-sm font-medium text-gray-700">Heure retardée</label>
-                <input type="time" name="delayed_time" id="delayed_time" 
-                       value="{{ old('delayed_time', $departure->delayed_time ?? '') }}"
-                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-            </div>
-
-            <div>
-                <label for="bus_id" class="block text-sm font-medium text-gray-700">Bus</label>
-                <select name="bus_id" id="bus_id" required
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                    @foreach($buses as $bus)
-                        <option value="{{ $bus->id }}" {{ old('bus_id', $departure->bus_id) == $bus->id ? 'selected' : '' }}>
-                            Bus N°{{ $bus->numero }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-
-            <div>
-                <label for="places_disponibles" class="block text-sm font-medium text-gray-700">Places disponibles</label>
-                <input type="number" name="places_disponibles" id="places_disponibles" 
-                       value="{{ old('places_disponibles', $departure->places_disponibles) }}" required
-                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-            </div>
-
-            <div>
-                <label for="prix" class="block text-sm font-medium text-gray-700">Prix</label>
-                <input type="number" step="0.01" name="prix" id="prix" 
-                       value="{{ old('prix', $departure->prix) }}" required
-                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-            </div>
-
-            <div class="flex justify-end space-x-4">
-                <a href="{{ route('dashboard.departures.index') }}" 
-                   class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50">
-                    Annuler
-                </a>
-                <button type="submit" 
-                        class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700">
+            <div class="flex justify-end mt-6">
+                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                     Mettre à jour
                 </button>
             </div>
         </form>
     </div>
 </div>
+@endsection
 
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const statusSelect = document.getElementById('status');
-    const delayedTimeContainer = document.getElementById('delayed_time_container');
     const delayedTimeInput = document.getElementById('delayed_time');
+    const scheduledTimeInput = document.getElementById('scheduled_time');
+    const delayedTimeContainer = document.getElementById('delayed_time_container');
 
-    function toggleDelayedTime() {
-        const isDelayed = statusSelect.value === '2';
-        delayedTimeContainer.classList.toggle('hidden', !isDelayed);
-        delayedTimeInput.required = isDelayed;
-        if (!isDelayed) {
+    function updateDelayedTime() {
+        const selectedStatus = statusSelect.value;
+        const scheduledTime = scheduledTimeInput.value;
+        
+        if (selectedStatus === '2') { // En retard
+            if (!delayedTimeInput.value && scheduledTime) {
+                const date = new Date(scheduledTime);
+                date.setHours(date.getHours() + 1);
+                delayedTimeInput.value = date.toISOString().slice(0, 16);
+            }
+        } else {
             delayedTimeInput.value = '';
         }
     }
 
-    // Initial check
-    toggleDelayedTime();
+    statusSelect.addEventListener('change', updateDelayedTime);
+    scheduledTimeInput.addEventListener('change', function() {
+        if (statusSelect.value === '2') {
+            updateDelayedTime();
+        }
+    });
 
+    // Initialisation
+    updateDelayedTime();
+});
 </script>
 @endpush
-@endsection
