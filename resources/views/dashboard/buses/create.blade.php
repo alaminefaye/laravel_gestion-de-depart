@@ -54,7 +54,8 @@
                         <label for="statut" class="block text-sm font-medium text-gray-700">Statut</label>
                         <select name="statut" id="statut" required
                                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                            <option value="Actif" {{ old('statut') == 'Actif' ? 'selected' : '' }}>Actif</option>
+                            <option value="">Sélectionnez un statut</option>
+                            <option value="En service" {{ old('statut') == 'En service' ? 'selected' : '' }}>En service</option>
                             <option value="En maintenance" {{ old('statut') == 'En maintenance' ? 'selected' : '' }}>En maintenance</option>
                             <option value="Hors service" {{ old('statut') == 'Hors service' ? 'selected' : '' }}>Hors service</option>
                         </select>

@@ -42,7 +42,7 @@
                         <td class="px-6 py-4 whitespace-nowrap">{{ $bus->annee }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             @switch($bus->statut)
-                                @case('Actif')
+                                @case('En service')
                                     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                                         {{ $bus->statut }}
                                     </span>
@@ -57,6 +57,10 @@
                                         {{ $bus->statut }}
                                     </span>
                                     @break
+                                @default
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                                        {{ $bus->statut }}
+                                    </span>
                             @endswitch
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">

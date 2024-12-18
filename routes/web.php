@@ -9,6 +9,8 @@ use App\Http\Controllers\BusController;
 use App\Http\Controllers\WelcomeController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\RoleController;
 
 Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
 
@@ -22,7 +24,16 @@ Route::middleware(['auth'])->group(function () {
     // Page d'accueil du dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     
-    Route::prefix('dashboard')->name('dashboard.')->group(function () {
+    Route::middleware(['auth'])->prefix('dashboard')->name('dashboard.')->group(function () {
+        // Page d'accueil du dashboard
+        Route::get('/', [DashboardController::class, 'index'])->name('index');
+        
+        // User Management Routes
+        Route::resource('users', UserController::class);
+        
+        // Role Management Routes
+        Route::resource('roles', RoleController::class);
+        
         // Gestion des départs
         Route::resource('departures', DepartureController::class);
         Route::put('/departures/{departure}/update-status', [DepartureController::class, 'updateStatus'])

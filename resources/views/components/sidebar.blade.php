@@ -45,10 +45,36 @@
             <span class="ml-3">Annonces</span>
         </a>
 
+        @can('view users')
+        <a href="{{ route('dashboard.users.index') }}" 
+           class="flex items-center px-4 py-3 text-white hover:bg-blue-800 transition-colors {{ request()->routeIs('dashboard.users.*') ? 'bg-blue-800' : '' }}">
+            <i class="fas fa-users w-6"></i>
+            <span class="ml-3">Utilisateurs</span>
+        </a>
+        @endcan
+
+        @can('view roles')
+        <a href="{{ route('dashboard.roles.index') }}" 
+           class="flex items-center px-4 py-3 text-white hover:bg-blue-800 transition-colors {{ request()->routeIs('dashboard.roles.*') ? 'bg-blue-800' : '' }}">
+            <i class="fas fa-user-shield w-6"></i>
+            <span class="ml-3">Rôles & Permissions</span>
+        </a>
+        @endcan
+
         <a href="{{ route('dashboard.settings') }}" 
            class="flex items-center px-4 py-3 text-white hover:bg-blue-800 transition-colors {{ request()->routeIs('dashboard.settings') ? 'bg-blue-800' : '' }}">
             <i class="fas fa-cog w-6"></i>
             <span class="ml-3">Paramètres</span>
         </a>
+            <!-- Bouton de déconnexion -->
+    <div class="absolute bottom-0 left-0 w-full p-4 border-t border-blue-800">
+        <form method="POST" action="{{ route('logout') }}" class="w-full">
+            @csrf
+            <button type="submit" class="flex items-center w-full px-4 py-3 text-white hover:bg-blue-800 transition-colors">
+                <i class="fas fa-sign-out-alt w-6"></i>
+                <span class="ml-3">Déconnexion</span>
+            </button>
+        </form>
+    </div>
     </nav>
 </div>

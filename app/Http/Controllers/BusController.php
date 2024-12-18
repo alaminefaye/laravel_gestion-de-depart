@@ -25,8 +25,13 @@ class BusController extends Controller
             'modele' => 'required|string|max:255',
             'capacite' => 'required|integer|min:1',
             'annee' => 'required|integer|min:1900|max:' . (date('Y') + 1),
-            'statut' => 'required|in:Actif,En maintenance,Hors service'
+            'statut' => 'required|in:En service,En maintenance,Hors service'
         ]);
+
+        // Ensure proper status value
+        if (!in_array($validated['statut'], ['En service', 'En maintenance', 'Hors service'])) {
+            $validated['statut'] = 'En service'; // Default value if invalid
+        }
 
         Bus::create($validated);
 

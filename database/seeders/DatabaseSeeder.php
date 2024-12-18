@@ -11,11 +11,20 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Database\Seeders\AnnouncementSeeder;
 use Database\Seeders\AdminUserSeeder;
+use Database\Seeders\AdvertisementSeeder;
+use Database\Seeders\RolesAndPermissionsSeeder;
 
 class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        $this->call([
+            RolesAndPermissionsSeeder::class,
+            AdminUserSeeder::class,
+            AdvertisementSeeder::class,
+            AnnouncementSeeder::class,
+        ]);
+
         // Création de l'utilisateur de test
         User::factory()->create([
             'name' => 'Test User',
@@ -93,12 +102,6 @@ class DatabaseSeeder extends Seeder
             'nombre_places' => 1,
             'statut' => 'confirmé',
             'prix_total' => 40.00,
-        ]);
-
-        // Création des annonces
-        $this->call([
-            AdminUserSeeder::class,
-            AnnouncementSeeder::class,
         ]);
     }
 }
