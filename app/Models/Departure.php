@@ -72,11 +72,21 @@ class Departure extends Model
 
     public function getFormattedScheduledTimeAttribute()
     {
-        return $this->scheduled_time ? $this->scheduled_time->format('d/m/Y H:i') : '';
+        return $this->scheduled_time ? $this->scheduled_time->format('H:i') : '';
     }
 
     public function getFormattedDelayedTimeAttribute()
     {
-        return $this->delayed_time ? $this->delayed_time->format('d/m/Y H:i') : '';
+        return $this->delayed_time ? $this->delayed_time->format('H:i') : '';
+    }
+
+    public function getFormattedScheduledDateAttribute()
+    {
+        return $this->scheduled_time ? $this->scheduled_time->format('d/m/Y') : '';
+    }
+
+    public function getFormattedDelayedDateAttribute()
+    {
+        return $this->delayed_time ? $this->delayed_time->format('d/m/Y') : '';
     }
 }
