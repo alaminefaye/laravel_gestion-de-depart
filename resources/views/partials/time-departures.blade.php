@@ -36,10 +36,10 @@
                         <tr class="bg-gray-50">
                             <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Route</th>
                             <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Départ Prévu</th>
-                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Heure Retardée</th>
-                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Statut</th>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Départ Effectif</th>
                             <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Bus</th>
                             <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Prix</th>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Statut</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
@@ -61,18 +61,17 @@
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-3 py-1 text-xs font-bold rounded-full {{ $statusClasses[$departure->status_label] }}">
-                                        {{ $departure->status_label }}
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="text-sm font-bold text-gray-900">N°{{ $departure->bus->numero }}</div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm">
-                                        <span class="font-bold text-gray-900">{{ number_format($departure->prix, 0, ',', ' ') }}</span>
-                                        <span class="text-gray-500 font-bold">CFA</span>
-                                    </div>
+                                    <span class="px-3 py-1 text-sm font-bold rounded-full bg-green-100 text-green-800 border border-green-200">
+                                        {{ $departure->formatted_price }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-3 py-1 text-xs font-bold rounded-full {{ $statusClasses[$departure->status_label] }}">
+                                        {{ $departure->status_label }}
+                                    </span>
                                 </td>
                             </tr>
                         @endforeach

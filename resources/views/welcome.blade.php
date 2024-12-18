@@ -63,9 +63,9 @@
         });
     @endphp
 
-    @if($announcements->count() > 0)
-        <div class="fixed bottom-0 left-0 right-0 bg-gradient-to-r from-blue-600 to-blue-800 text-white py-3 px-4 z-50 shadow-lg">
-            <div class="max-w-7xl mx-auto flex items-center justify-between">
+    <div class="fixed bottom-0 left-0 right-0 bg-gradient-to-r from-blue-600 to-blue-800 text-white py-3 px-4 z-50 shadow-lg">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            @if($announcements->count() > 0)
                 <p id="announcement-text" class="text-lg flex items-center flex-1">
                     <i class="fas fa-bullhorn mr-2"></i>
                     <span>{{ $announcements->first()->content }}</span>
@@ -82,9 +82,14 @@
                         </button>
                     @endif
                 </div>
-            </div>
+            @else
+                <p class="text-lg flex items-center justify-center w-full">
+                    <i class="fas fa-info-circle mr-2"></i>
+                    <span>Pas d'annonces disponibles pour l'instant</span>
+                </p>
+            @endif
         </div>
-    @endif
+    </div>
 
     <!-- Scripts -->
     <script>

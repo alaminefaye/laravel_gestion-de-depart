@@ -66,11 +66,13 @@
                 </div>
             @endforeach
         @else
-            <div class="flex items-center justify-center h-full bg-gray-700">
-                <p class="text-white text-center p-4">
-                    <i class="fas fa-film text-4xl mb-2"></i><br>
-                    Aucune publicité disponible
-                </p>
+            <div class="absolute inset-0 flex items-center justify-center bg-gray-700">
+                <div class="text-center">
+                    <i class="fas fa-film text-6xl mb-6 text-white block"></i>
+                    <p class="text-white text-3xl font-semibold px-4">
+                        Aucune publicité disponible
+                    </p>
+                </div>
             </div>
         @endif
     </div>

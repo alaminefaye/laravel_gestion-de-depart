@@ -36,6 +36,15 @@ class Departure extends Model
         'delayed_time'
     ];
 
+    protected $appends = [
+        'status_label',
+        'formatted_scheduled_date',
+        'formatted_scheduled_time',
+        'formatted_delayed_date',
+        'formatted_delayed_time',
+        'formatted_price'
+    ];
+
     public function bus()
     {
         return $this->belongsTo(Bus::class);
@@ -88,5 +97,10 @@ class Departure extends Model
     public function getFormattedDelayedDateAttribute()
     {
         return $this->delayed_time ? $this->delayed_time->format('d/m/Y') : '';
+    }
+
+    public function getFormattedPriceAttribute()
+    {
+        return number_format($this->prix, 0, ',', ' ') . ' FCFA';
     }
 }

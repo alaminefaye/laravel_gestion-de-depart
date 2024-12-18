@@ -1,8 +1,16 @@
+@php
+    $settings = \App\Models\SiteSetting::getSettings();
+@endphp
+
 <div class="fixed inset-y-0 left-0 w-64 bg-[#1a237e] text-white">
     <!-- Logo et titre -->
     <div class="flex items-center p-4 border-b border-blue-800">
-        <div class="w-8 h-8 bg-white rounded"></div>
-        <h1 class="ml-3 text-xl font-bold">Art Luxury Bus</h1>
+        @if($settings->logo_path)
+            <img src="{{ Storage::url($settings->logo_path) }}" alt="Logo" class="w-8 h-8 object-contain bg-white rounded">
+        @else
+            <div class="w-8 h-8 bg-white rounded"></div>
+        @endif
+        <h1 class="ml-3 text-xl font-bold">{{ $settings->site_name }}</h1>
     </div>
 
     <!-- Menu de navigation -->

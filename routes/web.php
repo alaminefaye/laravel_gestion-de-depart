@@ -8,6 +8,7 @@ use App\Http\Controllers\DepartureController;
 use App\Http\Controllers\BusController;
 use App\Http\Controllers\WelcomeController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Admin\SettingController;
 
 Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
 
@@ -42,15 +43,8 @@ Route::middleware(['auth'])->group(function () {
             ->name('announcements.toggle');
 
         // Paramètres
-        Route::get('/settings', [DashboardController::class, 'settings'])->name('settings');
-        Route::put('/settings/update-site', [DashboardController::class, 'updateSiteSettings'])
-            ->name('settings.update-site');
-        Route::put('/settings/update-notifications', [DashboardController::class, 'updateNotificationSettings'])
-            ->name('settings.update-notifications');
-        Route::put('/settings/update-maintenance', [DashboardController::class, 'updateMaintenanceSettings'])
-            ->name('settings.update-maintenance');
-        Route::put('/settings/update-booking', [DashboardController::class, 'updateBookingSettings'])
-            ->name('settings.update-booking');
+        Route::get('/settings', [SettingController::class, 'index'])->name('settings');
+        Route::put('/settings/update', [SettingController::class, 'update'])->name('settings.update');
     });
 });
 

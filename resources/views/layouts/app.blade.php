@@ -29,8 +29,14 @@
                 <div class="flex justify-between h-16">
                     <!-- Logo et liens principaux -->
                     <div class="flex">
-                        <div class="flex-shrink-0 flex items-center">
-                            <a href="/" class="text-xl font-bold text-blue-600">Art Luxury Bus</a>
+                        <div class="flex-shrink-0 flex items-center space-x-2">
+                            @php
+                                $settings = \App\Models\SiteSetting::getSettings();
+                            @endphp
+                            @if($settings->logo_path)
+                                <img src="{{ Storage::url($settings->logo_path) }}" alt="Logo" class="h-8 w-auto">
+                            @endif
+                            <a href="/" class="text-xl font-bold text-blue-600">{{ $settings->site_name }}</a>
                         </div>
                         <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
                             <a href="{{ route('dashboard') }}" class="text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 border-blue-500 text-sm font-medium">
