@@ -1,13 +1,19 @@
 <!-- Time and Departures -->
 <div class="space-y-6">
     <!-- Current Time -->
-    <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
-        <h2 class="flex items-center text-2xl font-bold text-gray-800 mb-4">
-            <i class="fas fa-clock mr-3 text-blue-600"></i>
-            Heure Actuelle
+    <div class="bg-gradient-to-br from-blue-600 to-blue-800 rounded-lg shadow-lg p-4 hover:shadow-xl transition-all duration-300 transform hover:scale-[1.01] w-full">
+        <h2 class="flex items-center justify-center text-lg font-bold text-white mb-3 animate-fade-in">
+            <i class="fas fa-clock mr-2 text-blue-200 animate-pulse"></i>
+            <span class="relative group">
+                Heure Actuelle
+                <div class="absolute -bottom-1 left-0 w-full h-0.5 bg-blue-200 transform origin-left scale-x-0 transition-transform duration-300 group-hover:scale-x-100"></div>
+            </span>
         </h2>
-        <div class="text-6xl font-bold text-blue-600 text-center tracking-tight" id="current-time"></div>
-        <div class="text-xl text-gray-600 text-center mt-2 font-medium" id="current-date"></div>
+        <div class="relative group">
+            <div class="text-5xl font-bold text-white text-center tracking-tight transition-all duration-300 transform group-hover:scale-105" id="current-time"></div>
+            <div class="absolute -inset-0.5 bg-blue-400 rounded-lg opacity-0 group-hover:opacity-10 transition duration-300 blur"></div>
+        </div>
+        <div class="text-base text-blue-100 text-center mt-2 font-medium transition-all duration-300 hover:text-white" id="current-date"></div>
     </div>
 
     <!-- Departures -->
@@ -88,10 +94,15 @@
         const timeElement = document.getElementById('current-time');
         const dateElement = document.getElementById('current-date');
         
-        const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+        // Format personnalisé pour H:MM:S
+        const hours = now.getHours();
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        const seconds = now.getSeconds().toString().padStart(2, '0');
+        const customTime = `${hours}:${minutes}:${seconds}`;
+        
         const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         
-        timeElement.textContent = now.toLocaleTimeString('fr-FR', timeOptions);
+        timeElement.textContent = customTime;
         dateElement.textContent = now.toLocaleDateString('fr-FR', dateOptions).charAt(0).toUpperCase() + now.toLocaleDateString('fr-FR', dateOptions).slice(1);
     }
 

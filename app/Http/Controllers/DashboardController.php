@@ -20,11 +20,13 @@ class DashboardController extends Controller
         $stats = [
             'total_voyages' => Departure::count(),
             'voyages_aujourdhui' => Departure::whereDate('scheduled_time', Carbon::today())->count(),
-            'reservations_mois' => Reservation::whereMonth('created_at', Carbon::now()->month)->count(),
+            'reservations_mois' => Reservation::whereMonth('created_at', Carbon::now()->month)
+                ->whereYear('created_at', Carbon::now()->year)
+                ->count(),
             'revenu_mois' => Reservation::whereMonth('created_at', Carbon::now()->month)
+                ->whereYear('created_at', Carbon::now()->year)
                 ->where('statut', 'Confirmé')
-                ->sum('montant_total'),
-            'taux_occupation' => Departure::avg('taux_occupation') ?? 0,
+                ->sum('prix_total'),
             'destinations_populaires' => Departure::select('route', DB::raw('count(*) as total'))
                 ->groupBy('route')
                 ->orderByDesc('total')
@@ -33,15 +35,6 @@ class DashboardController extends Controller
                 ->pluck('total', 'route')
                 ->toArray()
         ];
-
-        // Taux d'occupation moyen
-        $taux_occupation = Departure::whereDate('scheduled_time', '>=', Carbon::today())
-            ->whereNotNull('places_disponibles')
-            ->get()
-            ->avg(function ($departure) {
-                $places_occupees = $departure->reservations()->where('statut', 'Confirmé')->sum('nombre_places');
-                return ($places_occupees / $departure->places_disponibles) * 100;
-            });
 
         // Prochains départs
         $departures = Departure::with(['bus', 'reservations'])
@@ -72,7 +65,6 @@ class DashboardController extends Controller
 
         return view('dashboard.index', compact(
             'stats',
-            'taux_occupation',
             'departures',
             'buses',
             'bus_stats',
@@ -284,19 +276,29 @@ class DashboardController extends Controller
         // Statistiques mensuelles
         $monthlyStats = [
             'current' => [
-                'reservations' => Reservation::whereMonth('created_at', $currentMonth->month)->count(),
+                'reservations' => Reservation::whereMonth('created_at', $currentMonth->month)
+                    ->whereYear('created_at', $currentMonth->year)
+                    ->count(),
                 'revenue' => Reservation::whereMonth('created_at', $currentMonth->month)
+                    ->whereYear('created_at', $currentMonth->year)
                     ->where('statut', 'Confirmé')
-                    ->sum('montant_total'),
-                'departures' => Departure::whereMonth('scheduled_time', $currentMonth->month)->count(),
+                    ->sum('prix_total'),
+                'departures' => Departure::whereMonth('scheduled_time', $currentMonth->month)
+                    ->whereYear('scheduled_time', $currentMonth->year)
+                    ->count(),
                 'month_name' => $currentMonth->format('F')
             ],
             'last' => [
-                'reservations' => Reservation::whereMonth('created_at', $lastMonth->month)->count(),
+                'reservations' => Reservation::whereMonth('created_at', $lastMonth->month)
+                    ->whereYear('created_at', $lastMonth->year)
+                    ->count(),
                 'revenue' => Reservation::whereMonth('created_at', $lastMonth->month)
+                    ->whereYear('created_at', $lastMonth->year)
                     ->where('statut', 'Confirmé')
-                    ->sum('montant_total'),
-                'departures' => Departure::whereMonth('scheduled_time', $lastMonth->month)->count(),
+                    ->sum('prix_total'),
+                'departures' => Departure::whereMonth('scheduled_time', $lastMonth->month)
+                    ->whereYear('scheduled_time', $lastMonth->year)
+                    ->count(),
                 'month_name' => $lastMonth->format('F')
             ]
         ];
@@ -308,9 +310,6 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
-        // Taux d'occupation moyen
-        $averageOccupancy = Departure::avg('taux_occupation') ?? 0;
-
         // Statistiques des réservations par statut
         $reservationsByStatus = Reservation::select('statut', DB::raw('count(*) as total'))
             ->groupBy('statut')
@@ -319,7 +318,6 @@ class DashboardController extends Controller
         return view('dashboard.statistics', compact(
             'monthlyStats',
             'topDestinations',
-            'averageOccupancy',
             'reservationsByStatus'
         ));
     }

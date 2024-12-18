@@ -26,6 +26,9 @@ class AnnouncementController extends Controller
             'is_active' => 'boolean'
         ]);
 
+        // Générer un titre à partir du contenu
+        $validated['title'] = substr($validated['content'], 0, 100);
+
         Announcement::create($validated);
 
         return redirect()->route('dashboard.announcements.index')
@@ -44,6 +47,11 @@ class AnnouncementController extends Controller
             'position' => 'required|in:header,footer,sidebar',
             'is_active' => 'boolean'
         ]);
+
+        // Mettre à jour le titre si le contenu a changé
+        if ($announcement->content !== $validated['content']) {
+            $validated['title'] = substr($validated['content'], 0, 100);
+        }
 
         $announcement->update($validated);
 

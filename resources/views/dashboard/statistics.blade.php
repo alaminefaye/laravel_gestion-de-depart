@@ -49,7 +49,7 @@
         </div>
 
         <!-- Autres statistiques -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- Top 5 des destinations -->
             <div class="bg-gray-50 rounded-lg p-6">
                 <h3 class="text-lg font-semibold text-gray-800 mb-4">Top 5 des destinations</h3>
@@ -73,17 +73,6 @@
                         <span class="font-semibold text-blue-600">{{ $status->total }}</span>
                     </div>
                     @endforeach
-                </div>
-            </div>
-
-            <!-- Taux d'occupation moyen -->
-            <div class="bg-gray-50 rounded-lg p-6">
-                <h3 class="text-lg font-semibold text-gray-800 mb-4">Taux d'occupation moyen</h3>
-                <div class="bg-white rounded-lg p-6 shadow text-center">
-                    <div class="inline-flex items-center justify-center w-32 h-32 rounded-full bg-blue-50 mb-4">
-                        <p class="text-4xl font-bold text-blue-600">{{ number_format($averageOccupancy, 1) }}%</p>
-                    </div>
-                    <p class="text-gray-600">des sièges sont occupés en moyenne</p>
                 </div>
             </div>
         </div>

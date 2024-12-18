@@ -173,48 +173,16 @@
         </div>
 
         <!-- Graphiques statistiques -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Taux d'occupation -->
-            <div class="bg-white rounded-lg shadow p-6">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Taux d'occupation moyen</h3>
-                <div class="relative pt-1">
-                    <div class="flex mb-2 items-center justify-between">
-                        <div>
-                            <span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-blue-600 bg-blue-200">
-                                Progression
-                            </span>
-                        </div>
-                        <div class="text-right">
-                            <span class="text-xs font-semibold inline-block text-blue-600">
-                                {{ number_format($stats['taux_occupation'], 1) }}%
-                            </span>
-                        </div>
-                    </div>
-                    <div class="overflow-hidden h-2 mb-4 text-xs flex rounded bg-blue-200">
-                        <div style="width:{{ $stats['taux_occupation'] }}%" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-blue-500"></div>
-                    </div>
-                </div>
-            </div>
-
+        <div class="grid grid-cols-1 gap-6">
             <!-- Destinations populaires -->
             <div class="bg-white rounded-lg shadow p-6">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Destinations populaires</h3>
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">Destinations populaires</h3>
                 <div class="space-y-4">
-                    @foreach($stats['destinations_populaires'] as $destination => $total)
-                    <div class="flex items-center">
-                        <div class="flex-1">
-                            <div class="flex items-center justify-between mb-1">
-                                <span class="text-sm font-medium text-gray-700">{{ $destination }}</span>
-                                <span class="text-sm font-medium text-gray-900">{{ $total }} voyages</span>
-                            </div>
-                            <div class="overflow-hidden h-2 text-xs flex rounded bg-blue-200">
-                                @php
-                                    $percentage = ($total / max($stats['destinations_populaires'])) * 100;
-                                @endphp
-                                <div style="width:{{ $percentage }}%" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-blue-500"></div>
-                            </div>
+                    @foreach($stats['destinations_populaires'] as $route => $total)
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-600">{{ $route }}</span>
+                            <span class="text-gray-900 font-medium">{{ $total }} voyages</span>
                         </div>
-                    </div>
                     @endforeach
                 </div>
             </div>
