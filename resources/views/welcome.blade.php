@@ -38,6 +38,24 @@
         .hover-up { transition: transform 0.3s ease; }
         .hover-up:hover { transform: translateY(-5px); }
 
+        /* Animation bleue pour les contacts */
+        .contact-animation {
+            background: linear-gradient(90deg, #2563EB, #4F46E5, #2563EB);
+            background-size: 200% auto;
+            animation: contactShine 3s linear infinite;
+            transition: all 0.3s ease;
+        }
+        
+        @keyframes contactShine {
+            0% { background-position: 200% center; }
+            100% { background-position: -200% center; }
+        }
+        
+        .contact-animation:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3);
+        }
+
         /* Animations des prix */
         @keyframes priceGlow {
             0% { transform: scale(1); box-shadow: 0 0 0 rgba(16, 185, 129, 0.4); }

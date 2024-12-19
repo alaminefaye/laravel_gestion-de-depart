@@ -25,7 +25,7 @@
                         <div class="flex items-center space-x-2">
                             @if($settings->contact_phone)
                                 <a href="tel:{{ $settings->contact_phone }}" 
-                                   class="price-animation text-white transition-all duration-300 flex items-center space-x-2 rounded-lg px-3 py-1.5">
+                                   class="contact-animation text-white transition-all duration-300 flex items-center space-x-2 rounded-lg px-3 py-1.5">
                                     <i class="fas fa-phone-alt text-white"></i>
                                     <span class="font-medium">{{ $settings->contact_phone }}</span>
                                 </a>
@@ -35,7 +35,7 @@
                             @endif
                             @if($settings->contact_phone_2)
                                 <a href="tel:{{ $settings->contact_phone_2 }}" 
-                                   class="price-animation text-white transition-all duration-300 flex items-center space-x-2 rounded-lg px-3 py-1.5">
+                                   class="contact-animation text-white transition-all duration-300 flex items-center space-x-2 rounded-lg px-3 py-1.5">
                                     <i class="fas fa-phone-alt text-white"></i>
                                     <span class="font-medium">{{ $settings->contact_phone_2 }}</span>
                                 </a>
@@ -44,7 +44,7 @@
                     @endif
                     @if($settings->contact_email)
                         <a href="mailto:{{ $settings->contact_email }}" 
-                           class="price-animation text-white transition-all duration-300 flex items-center space-x-2 rounded-lg px-3 py-1.5">
+                           class="contact-animation text-white transition-all duration-300 flex items-center space-x-2 rounded-lg px-3 py-1.5">
                             <i class="fas fa-envelope text-white"></i>
                             <span class="font-medium">{{ $settings->contact_email }}</span>
                         </a>
