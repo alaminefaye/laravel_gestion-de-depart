@@ -13,8 +13,8 @@ class WelcomeController extends Controller
     {
         $announcements = Announcement::where('is_active', true)->get();
         
-        // Récupérer les départs avec les relations bus
-        $departures = Departure::with('bus')
+        // Récupérer les départs avec les relations bus et réservations
+        $departures = Departure::with(['bus', 'reservations'])
             ->whereDate('scheduled_time', '>=', now())
             ->orderBy('scheduled_time')
             ->take(5)

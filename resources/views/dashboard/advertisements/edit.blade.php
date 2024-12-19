@@ -107,6 +107,7 @@
 
                 <div class="md:col-span-2">
                     <div class="flex items-center">
+                        <input type="hidden" name="is_active" value="0">
                         <input type="checkbox" name="is_active" id="is_active" value="1"
                                {{ old('is_active', $advertisement->is_active) ? 'checked' : '' }}
                                class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">

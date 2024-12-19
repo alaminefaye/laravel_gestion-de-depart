@@ -26,7 +26,7 @@ class AdvertisementController extends Controller
             'video_type' => 'required|in:upload,youtube,drive',
             'video' => 'required_if:video_type,upload|file|mimetypes:video/mp4,video/quicktime|max:51200',
             'video_link' => 'required_if:video_type,youtube,drive|url',
-            'is_active' => 'nullable|in:1,true,false,0',
+            'is_active' => 'boolean',
             'display_order' => 'integer|min:0',
         ]);
 
@@ -34,7 +34,7 @@ class AdvertisementController extends Controller
             'title' => $validated['title'],
             'video_type' => $validated['video_type'],
             'display_order' => $validated['display_order'] ?? 0,
-            'is_active' => $request->has('is_active'),
+            'is_active' => $request->boolean('is_active'),
         ];
 
         if ($request->video_type === 'upload' && $request->hasFile('video')) {
@@ -62,7 +62,7 @@ class AdvertisementController extends Controller
             'video_type' => 'required|in:upload,youtube,drive',
             'video' => 'nullable|file|mimetypes:video/mp4,video/quicktime|max:51200',
             'video_link' => 'required_if:video_type,youtube,drive|url',
-            'is_active' => 'nullable|in:1,true,false,0',
+            'is_active' => 'boolean',
             'display_order' => 'integer|min:0',
         ]);
 
@@ -70,7 +70,7 @@ class AdvertisementController extends Controller
             'title' => $validated['title'],
             'video_type' => $validated['video_type'],
             'display_order' => $validated['display_order'] ?? 0,
-            'is_active' => $request->has('is_active'),
+            'is_active' => $request->boolean('is_active'),
         ];
 
         if ($request->video_type === 'upload' && $request->hasFile('video')) {

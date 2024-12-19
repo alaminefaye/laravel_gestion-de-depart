@@ -1,9 +1,12 @@
 <!-- Video Section -->
-<div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden hover-up relative h-full">
-    <div class="video-container" id="videoCarousel">
-        @if($advertisements->count() > 0)
-            @foreach($advertisements as $index => $advertisement)
-                <div class="video-item {{ $index === 0 ? '' : 'hidden' }}" data-index="{{ $index }}">
+<div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden hover-up h-full">
+    <div class="aspect-w-16 aspect-h-9 relative w-full h-full" id="videoCarousel">
+        @php
+            $activeAds = $advertisements->where('is_active', true)->values();
+        @endphp
+        @if($activeAds->count() > 0)
+            @foreach($activeAds as $index => $advertisement)
+                <div class="video-item absolute inset-0 {{ $index === 0 ? '' : 'hidden' }}" data-index="{{ $index }}">
                     @if($advertisement->video_type === 'upload')
                         <video 
                             id="adVideo_{{ $index }}"
@@ -11,91 +14,100 @@
                             {{ $index === 0 ? 'autoplay' : '' }}
                             muted
                             playsinline
-                            class="w-full h-full object-cover"
-                            onended="playNextVideo({{ $index }})">
+                            class="w-full h-full object-contain bg-black"
+                            onended="playNextVideo({{ $index }}, {{ $activeAds->count() }})">
                         </video>
-                        <button onclick="toggleSound('adVideo_{{ $index }}')" class="absolute bottom-4 right-4 bg-black bg-opacity-50 text-white p-1.5 rounded-full hover:bg-opacity-75 transition-all z-10">
-                            <i id="soundIcon_adVideo_{{ $index }}" class="fas fa-volume-mute text-sm"></i>
-                        </button>
+                        <div class="video-controls absolute bottom-4 right-4 bg-black bg-opacity-50 rounded-lg p-2">
+                            <button onclick="toggleSound('adVideo_{{ $index }}')" class="text-white">
+                                <i id="soundIcon_adVideo_{{ $index }}" class="fas fa-volume-mute"></i>
+                                <span class="text-sm ml-1">Son</span>
+                            </button>
+                        </div>
                     @elseif($advertisement->video_type === 'youtube')
                         @php
                             $videoId = '';
-                            if (preg_match('/(?:youtube\.com\/(?:[^\/\n\s]+\/\s*[^\/\n\s]+\/|(?:v|e(?:mbed)?)\/|\s*[^\/\n\s]+\?v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/', $advertisement->video_path, $matches)) {
-                                $videoId = $matches[1];
+                            // Gérer différents formats d'URL YouTube
+                            if (strpos($advertisement->video_path, 'youtu.be/') !== false) {
+                                $videoId = substr($advertisement->video_path, strrpos($advertisement->video_path, '/') + 1);
+                            } elseif (strpos($advertisement->video_path, 'watch?v=') !== false) {
+                                parse_str(parse_url($advertisement->video_path, PHP_URL_QUERY), $params);
+                                $videoId = $params['v'] ?? '';
+                            } elseif (strpos($advertisement->video_path, 'embed/') !== false) {
+                                $videoId = substr($advertisement->video_path, strrpos($advertisement->video_path, '/') + 1);
                             }
+                            // Nettoyer l'ID de la vidéo
+                            $videoId = preg_replace('/[^a-zA-Z0-9_-]/', '', $videoId);
                         @endphp
                         @if($videoId)
-                            <div id="youtube-container_{{ $index }}">
-                                <iframe 
-                                    id="youtubeVideo_{{ $index }}"
-                                    src="https://www.youtube.com/embed/{{ $videoId }}?enablejsapi=1&autoplay={{ $index === 0 ? '1' : '0' }}&mute=1&controls=0&rel=0&modestbranding=1&showinfo=0" 
-                                    frameborder="0" 
-                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                                    allowfullscreen>
-                                </iframe>
-                                <button onclick="toggleYouTubeSound({{ $index }})" class="absolute bottom-4 right-4 bg-black bg-opacity-50 text-white p-1.5 rounded-full hover:bg-opacity-75 transition-all z-10">
-                                    <i id="soundIcon_youtube_{{ $index }}" class="fas fa-volume-mute text-sm"></i>
-                                </button>
+                            <div class="relative w-full h-full" id="youtubeContainer_{{ $index }}">
+                                <div id="youtubePlayer_{{ $index }}" class="absolute inset-0 w-full h-full"></div>
                             </div>
                         @endif
                     @elseif($advertisement->video_type === 'drive')
-                        @php
-                            $driveUrl = $advertisement->video_path;
-                            if (preg_match('/\/d\/([a-zA-Z0-9_-]+)/', $driveUrl, $matches)) {
-                                $fileId = $matches[1];
-                                $embedUrl = "https://drive.google.com/file/d/" . $fileId . "/preview";
-                            }
-                        @endphp
-                        @if(isset($embedUrl))
-                            <div id="drive-video-container_{{ $index }}">
-                                <iframe 
-                                    id="drive-video_{{ $index }}"
-                                    src="{{ $embedUrl }}"
-                                    frameborder="0" 
-                                    allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" 
-                                    allowfullscreen>
-                                </iframe>
-                            </div>
-                        @endif
+                        <iframe 
+                            id="driveVideo_{{ $index }}"
+                            src="{{ $advertisement->video_path }}"
+                            frameborder="0"
+                            class="absolute inset-0 w-full h-full"
+                            allowfullscreen>
+                        </iframe>
                     @endif
-                    <!-- <div class="p-4 bg-gradient-to-r from-blue-600 to-blue-800 text-white">
-                        <h3 class="text-xl font-semibold">
-                            <i class="fas fa-star mr-2"></i>{{ $advertisement->title }}
-                        </h3>
-                    </div> -->
                 </div>
             @endforeach
         @else
-            <div class="absolute inset-0 flex items-center justify-center bg-gray-700">
-                <div class="text-center">
-                    <i class="fas fa-film text-6xl mb-6 text-white block"></i>
-                    <p class="text-white text-3xl font-semibold px-4">
-                        Aucune publicité disponible
-                    </p>
-                </div>
+            <div class="flex items-center justify-center h-full bg-gray-900">
+                <p class="text-white text-lg">Aucune publicité disponible</p>
             </div>
         @endif
     </div>
 </div>
 
 <script>
-// Variables globales
-let currentVideoIndex = 0;
-const totalVideos = {{ $advertisements->count() }};
 let youtubePlayers = {};
-window.activeAudioId = null;
+let currentVideoIndex = 0;
 
-// Initialisation des lecteurs YouTube
+// Configuration des joueurs YouTube
 function onYouTubeIframeAPIReady() {
-    @foreach($advertisements as $index => $advertisement)
+    @foreach($activeAds as $index => $advertisement)
         @if($advertisement->video_type === 'youtube')
-            youtubePlayers[{{ $index }}] = new YT.Player('youtubeVideo_{{ $index }}', {
+            @php
+                $videoId = '';
+                if (strpos($advertisement->video_path, 'youtu.be/') !== false) {
+                    $videoId = substr($advertisement->video_path, strrpos($advertisement->video_path, '/') + 1);
+                } elseif (strpos($advertisement->video_path, 'watch?v=') !== false) {
+                    parse_str(parse_url($advertisement->video_path, PHP_URL_QUERY), $params);
+                    $videoId = $params['v'] ?? '';
+                } elseif (strpos($advertisement->video_path, 'embed/') !== false) {
+                    $videoId = substr($advertisement->video_path, strrpos($advertisement->video_path, '/') + 1);
+                }
+                $videoId = preg_replace('/[^a-zA-Z0-9_-]/', '', $videoId);
+            @endphp
+            youtubePlayers[{{ $index }}] = new YT.Player('youtubePlayer_{{ $index }}', {
+                videoId: '{{ $videoId }}',
+                playerVars: {
+                    'autoplay': {{ $index === 0 ? 1 : 0 }},
+                    'mute': 1,
+                    'controls': 1,
+                    'rel': 0,
+                    'modestbranding': 1,
+                    'playsinline': 1,
+                    'origin': '{{ url("/") }}'
+                },
                 events: {
-                    'onReady': function(event) { event.target.mute(); },
+                    'onReady': function(event) {
+                        if ({{ $index }} === 0) {
+                            event.target.playVideo();
+                        }
+                    },
                     'onStateChange': function(event) {
                         if (event.data === YT.PlayerState.ENDED) {
-                            playNextVideo({{ $index }});
+                            playNextVideo({{ $index }}, {{ $activeAds->count() }});
                         }
+                    },
+                    'onError': function(event) {
+                        console.log('YouTube Error:', event.data);
+                        // En cas d'erreur, passer à la vidéo suivante
+                        playNextVideo({{ $index }}, {{ $activeAds->count() }});
                     }
                 }
             });
@@ -103,93 +115,56 @@ function onYouTubeIframeAPIReady() {
     @endforeach
 }
 
-// Fonction pour jouer la vidéo suivante
-function playNextVideo(currentIndex) {
-    // Cacher la vidéo actuelle
-    document.querySelector(`.video-item[data-index="${currentIndex}"]`).classList.add('hidden');
-    
-    // Calculer l'index de la prochaine vidéo
-    let nextIndex = (currentIndex + 1) % totalVideos;
-    
-    // Afficher la prochaine vidéo
-    const nextVideo = document.querySelector(`.video-item[data-index="${nextIndex}"]`);
-    nextVideo.classList.remove('hidden');
-    
-    // Gérer la lecture selon le type de vidéo
-    const videoElement = document.getElementById(`adVideo_${nextIndex}`);
-    if (videoElement) {
-        videoElement.play();
-    } else if (youtubePlayers[nextIndex]) {
-        youtubePlayers[nextIndex].playVideo();
+function playNextVideo(currentIndex, totalVideos) {
+    // Masquer la vidéo actuelle
+    const currentVideo = document.querySelector(`[data-index="${currentIndex}"]`);
+    if (currentVideo) {
+        currentVideo.classList.add('hidden');
     }
-    
-    // Mettre à jour l'index courant
+
+    // Arrêter la vidéo YouTube actuelle si elle existe
+    if (youtubePlayers[currentIndex]) {
+        youtubePlayers[currentIndex].stopVideo();
+    }
+
+    // Calculer l'index de la prochaine vidéo
+    const nextIndex = (currentIndex + 1) % totalVideos;
     currentVideoIndex = nextIndex;
+
+    // Afficher la prochaine vidéo
+    const nextVideo = document.querySelector(`[data-index="${nextIndex}"]`);
+    if (nextVideo) {
+        nextVideo.classList.remove('hidden');
+        
+        // Gérer la lecture selon le type de vidéo
+        const nextHtmlVideo = document.getElementById(`adVideo_${nextIndex}`);
+        if (nextHtmlVideo) {
+            nextHtmlVideo.currentTime = 0;
+            nextHtmlVideo.play();
+        } else if (youtubePlayers[nextIndex]) {
+            youtubePlayers[nextIndex].playVideo();
+        }
+    }
 }
 
-// Fonction pour contrôler le son des vidéos uploadées
 function toggleSound(videoId) {
     const video = document.getElementById(videoId);
-    const icon = document.getElementById('soundIcon_' + videoId);
+    const soundIcon = document.getElementById(`soundIcon_${videoId}`);
     
     if (video) {
-        // Couper le son de la vidéo précédente
-        if (window.activeAudioId && window.activeAudioId !== videoId) {
-            const prevVideo = document.getElementById(window.activeAudioId);
-            const prevIcon = document.getElementById('soundIcon_' + window.activeAudioId);
-            if (prevVideo) {
-                prevVideo.muted = true;
-                if (prevIcon) {
-                    prevIcon.className = 'fas fa-volume-mute text-sm';
-                }
-            }
-        }
-
-        // Basculer le son de la vidéo courante
         video.muted = !video.muted;
-        icon.className = video.muted ? 'fas fa-volume-mute text-sm' : 'fas fa-volume-up text-sm';
-        window.activeAudioId = video.muted ? null : videoId;
+        soundIcon.className = video.muted ? 'fas fa-volume-mute' : 'fas fa-volume-up';
     }
 }
 
-// Fonction pour contrôler le son des vidéos YouTube
-function toggleYouTubeSound(index) {
-    const player = youtubePlayers[index];
-    const icon = document.getElementById(`soundIcon_youtube_${index}`);
-    
-    if (player && player.isMuted) {
-        // Couper le son de la vidéo précédente
-        if (window.activeAudioId) {
-            const prevVideo = document.getElementById(window.activeAudioId);
-            const prevIcon = document.getElementById('soundIcon_' + window.activeAudioId);
-            if (prevVideo) {
-                prevVideo.muted = true;
-                if (prevIcon) {
-                    prevIcon.className = 'fas fa-volume-mute text-sm';
-                }
-            }
-        }
+// Charger l'API YouTube
+const tag = document.createElement('script');
+tag.src = "https://www.youtube.com/iframe_api";
+const firstScriptTag = document.getElementsByTagName('script')[0];
+firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
-        if (player.isMuted()) {
-            player.unMute();
-            icon.className = 'fas fa-volume-up text-sm';
-            window.activeAudioId = `youtubeVideo_${index}`;
-        } else {
-            player.mute();
-            icon.className = 'fas fa-volume-mute text-sm';
-            window.activeAudioId = null;
-        }
-    }
-}
-
-// S'assurer que toutes les vidéos sont muettes au chargement
-document.addEventListener('DOMContentLoaded', function() {
-    const videos = document.getElementsByTagName('video');
-    for (let video of videos) {
-        video.muted = true;
-    }
-});
+// Gérer les erreurs globales de l'API YouTube
+window.onYouTubeIframeAPIError = function(error) {
+    console.error('YouTube API Error:', error);
+};
 </script>
-
-<!-- Chargement de l'API YouTube -->
-<script src="https://www.youtube.com/iframe_api"></script>

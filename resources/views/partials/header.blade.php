@@ -8,10 +8,10 @@
         <div class="flex items-center justify-between">
             <div class="flex items-center space-x-4">
                 @if($settings->logo_path)
-                    <img src="{{ Storage::url($settings->logo_path) }}" alt="Logo" class="w-12 h-12 object-contain bg-white rounded-full">
+                    <img src="{{ Storage::url($settings->logo_path) }}" alt="Logo" class="w-20 h-20 object-contain bg-white rounded-full">
                 @else
-                    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                        <i class="fas fa-bus text-2xl text-blue-600"></i>
+                    <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-bus text-4xl text-blue-600"></i>
                     </div>
                 @endif
                 <div>

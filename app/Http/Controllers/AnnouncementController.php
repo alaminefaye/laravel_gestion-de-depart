@@ -53,6 +53,9 @@ class AnnouncementController extends Controller
             $validated['title'] = substr($validated['content'], 0, 100);
         }
 
+        // Convertir explicitement is_active en booléen
+        $validated['is_active'] = $request->boolean('is_active');
+
         $announcement->update($validated);
 
         return redirect()->route('dashboard.announcements.index')

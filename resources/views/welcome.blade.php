@@ -37,6 +37,31 @@
         }
         .hover-up { transition: transform 0.3s ease; }
         .hover-up:hover { transform: translateY(-5px); }
+
+        /* Animations des prix */
+        @keyframes priceGlow {
+            0% { transform: scale(1); box-shadow: 0 0 0 rgba(16, 185, 129, 0.4); }
+            50% { transform: scale(1.05); box-shadow: 0 0 20px rgba(16, 185, 129, 0.6); }
+            100% { transform: scale(1); box-shadow: 0 0 0 rgba(16, 185, 129, 0.4); }
+        }
+        
+        @keyframes priceShine {
+            0% { background-position: 200% center; }
+            100% { background-position: -200% center; }
+        }
+        
+        .price-animation {
+            animation: priceGlow 2s infinite ease-in-out;
+            background: linear-gradient(90deg, #10B981, #059669, #10B981);
+            background-size: 200% auto;
+            animation: priceShine 3s linear infinite;
+            transition: all 0.3s ease;
+        }
+        
+        .price-animation:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3);
+        }
     </style>
 </head>
 <body class="antialiased bg-gray-50">
@@ -45,11 +70,13 @@
     <!-- Main Content -->
     <main class="w-full py-8">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 px-0 lg:px-4">
-            <div class="lg:col-span-6">
+            <div class="lg:col-span-6 h-[600px]">
                 @include('partials.video-section')
             </div>
             <div class="lg:col-span-6 px-4 lg:px-0">
-                @include('partials.time-departures')
+                <div class="h-[600px] overflow-y-auto relative">
+                    @include('partials.time-departures')
+                </div>
             </div>
         </div>
     </main>

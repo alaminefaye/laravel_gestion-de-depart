@@ -49,7 +49,8 @@
             </div>
 
             <div class="flex items-center">
-                <input type="checkbox" name="is_active" id="is_active" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-500 focus:ring-blue-500" {{ old('is_active', $announcement->is_active) ? 'checked' : '' }}>
+                <input type="hidden" name="is_active" value="0">
+                <input type="checkbox" name="is_active" id="is_active" value="1" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-500 focus:ring-blue-500" {{ old('is_active', $announcement->is_active) ? 'checked' : '' }}>
                 <label for="is_active" class="ml-2 block text-sm text-gray-700">Activer l'annonce</label>
                 @error('is_active')
                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>

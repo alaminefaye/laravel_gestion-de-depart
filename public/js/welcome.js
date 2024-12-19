@@ -23,18 +23,63 @@ function updateTime() {
 // Announcement carousel functionality
 class AnnouncementCarousel {
     constructor(announcements) {
-        this.announcements = announcements;
+        // Filtrer pour ne garder que les annonces actives
+        this.announcements = announcements.filter(announcement => announcement.is_active);
         this.currentIndex = 0;
         this.isTTSEnabled = false;
         this.currentAudio = null;
+        this.useFemaleTTS = false; // Pour alterner entre les voix
+        this.voices = null;
         this.init();
     }
 
     init() {
-        // Start carousel if there are multiple announcements
+        // Initialiser les voix
+        if ('speechSynthesis' in window) {
+            // Charger les voix disponibles
+            window.speechSynthesis.onvoiceschanged = () => {
+                this.voices = window.speechSynthesis.getVoices();
+            };
+            this.voices = window.speechSynthesis.getVoices();
+        }
+
+        // Start carousel if there are multiple active announcements
         if (this.announcements.length > 1) {
             setInterval(() => this.updateAnnouncement(), 20000);
         }
+    }
+
+    getVoice() {
+        if (!this.voices) return null;
+
+        // Filtrer les voix françaises
+        const frenchVoices = this.voices.filter(voice => 
+            voice.lang.startsWith('fr') || voice.lang.startsWith('fr-FR')
+        );
+
+        // Si pas de voix française, utiliser la première voix disponible
+        if (frenchVoices.length === 0) return this.voices[0];
+
+        // Alterner entre voix masculine et féminine
+        this.useFemaleTTS = !this.useFemaleTTS;
+        
+        // Essayer de trouver une voix qui correspond au genre souhaité
+        const voiceNames = {
+            female: ['amelie', 'marie', 'julie', 'celine', 'female', 'femme'],
+            male: ['thomas', 'nicolas', 'male', 'homme']
+        };
+        
+        const voice = frenchVoices.find(v => {
+            const name = v.name.toLowerCase();
+            if (this.useFemaleTTS) {
+                return voiceNames.female.some(femaleName => name.includes(femaleName));
+            } else {
+                return voiceNames.male.some(maleName => name.includes(maleName));
+            }
+        });
+
+        // Si aucune voix spécifique n'est trouvée, utiliser la première voix française
+        return voice || frenchVoices[0];
     }
 
     toggleTTS() {
@@ -50,15 +95,21 @@ class AnnouncementCarousel {
     }
 
     updateAnnouncement() {
-        this.currentIndex = (this.currentIndex + 1) % this.announcements.length;
-        const announcement = this.announcements[this.currentIndex];
-        
-        // Update text
-        document.getElementById('announcement-text').querySelector('span').textContent = announcement.content;
-        
-        // If TTS is enabled, speak the new announcement
-        if (this.isTTSEnabled) {
-            this.speakAnnouncement(announcement.content);
+        // Ne mettre à jour que s'il y a des annonces actives
+        if (this.announcements.length > 0) {
+            this.currentIndex = (this.currentIndex + 1) % this.announcements.length;
+            const announcement = this.announcements[this.currentIndex];
+            
+            // Update text
+            const textElement = document.getElementById('announcement-text');
+            if (textElement && textElement.querySelector('span')) {
+                textElement.querySelector('span').textContent = announcement.content;
+            }
+            
+            // If TTS is enabled, speak the new announcement
+            if (this.isTTSEnabled) {
+                this.speakAnnouncement(announcement.content);
+            }
         }
     }
 
@@ -67,6 +118,23 @@ class AnnouncementCarousel {
             window.speechSynthesis.cancel(); // Stop any ongoing speech
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = 'fr-FR';
+            
+            // Définir la voix
+            const voice = this.getVoice();
+            if (voice) {
+                utterance.voice = voice;
+                // Ajuster le pitch et le taux selon le genre
+                if (this.useFemaleTTS) {
+                    utterance.pitch = 1.0; // Voix plus naturelle pour la femme
+                    utterance.rate = 1.0;  // Vitesse normale
+                    utterance.volume = 1.0; // Volume maximum
+                } else {
+                    utterance.pitch = 0.9; // Voix légèrement plus grave pour Thomas
+                    utterance.rate = 0.9;
+                    utterance.volume = 1.0;
+                }
+            }
+            
             window.speechSynthesis.speak(utterance);
         }
     }
