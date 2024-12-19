@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Support\Facades\Session;
 
 class User extends Authenticatable
 {
@@ -46,5 +47,27 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function sessions()
+    {
+        return Session::where('user_id', $this->id)->get();
+    }
+
+    public function hasMultipleSessions()
+    {
+        return $this->sessions()->count() > 1;
+    }
+
+    public function getActiveSessionsAttribute()
+    {
+        return $this->sessions()->map(function ($session) {
+            return [
+                'id' => $session->id,
+                'ip_address' => $session->ip_address,
+                'user_agent' => $session->user_agent,
+                'last_activity' => $session->last_activity,
+            ];
+        });
     }
 }

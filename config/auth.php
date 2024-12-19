@@ -40,6 +40,11 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+        'api' => [
+            'driver' => 'token',
+            'provider' => 'users',
+            'hash' => false,
+        ],
     ],
 
     /*
@@ -112,4 +117,9 @@ return [
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
+    'allow_multiple_sessions' => true,
+
+    'session_lifetime' => env('SESSION_LIFETIME', 120),
+    
+    'session_expire_on_close' => false,
 ];
