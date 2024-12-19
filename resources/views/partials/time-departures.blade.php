@@ -31,29 +31,29 @@
                     'Inconnu' => 'bg-gray-500 text-white border border-gray-700',
                 ];
             @endphp
-            <div class="overflow-x-auto rounded-lg border border-gray-200">
-                <table class="min-w-full divide-y divide-gray-200">
+            <div class="w-full">
+                <table class="min-w-full table-fixed">
                     <thead>
                         <tr class="bg-gray-50">
-                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Route</th>
-                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Départ Prévu</th>
-                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Départ Effectif</th>
-                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Bus</th>
-                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Prix</th>
-                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Statut</th>
+                            <th class="w-1/6 px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Route</th>
+                            <th class="w-1/6 px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Départ Prévu</th>
+                            <th class="w-1/6 px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Départ Effectif</th>
+                            <th class="w-1/6 px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Bus</th>
+                            <th class="w-1/6 px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Prix</th>
+                            <th class="w-1/6 px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Statut</th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
+                    <tbody class="bg-white">
                         @foreach($departures as $departure)
                             <tr class="hover:bg-gray-50 transition-colors duration-200">
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm font-bold text-gray-900">{{ $departure->route }}</div>
+                                <td class="px-4 py-3">
+                                    <div class="text-sm font-bold text-gray-900 truncate">{{ $departure->route }}</div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
+                                <td class="px-4 py-3">
                                     <div class="text-xs text-gray-500">{{ $departure->formatted_scheduled_date }}</div>
                                     <div class="text-sm font-bold text-gray-900">{{ $departure->formatted_scheduled_time }}</div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
+                                <td class="px-4 py-3">
                                     @if($departure->formatted_delayed_time)
                                         <div class="text-xs text-gray-500">{{ $departure->formatted_delayed_date }}</div>
                                         <div class="text-sm font-bold text-red-600">{{ $departure->formatted_delayed_time }}</div>
@@ -61,17 +61,17 @@
                                         <div class="text-sm font-bold text-gray-400">-</div>
                                     @endif
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
+                                <td class="px-4 py-3">
                                     <div class="text-sm font-bold text-gray-900">N°{{ $departure->bus->numero }}</div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-3 py-1 text-sm font-bold rounded-full bg-green-100 text-green-800 border border-green-200">
+                                <td class="px-4 py-3">
+                                    <span class="px-2 py-1 text-sm font-bold rounded-full bg-green-100 text-green-800 border border-green-200">
                                         {{ $departure->formatted_price }}
                                     </span>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-3 py-1 text-xs font-bold rounded-full {{ $statusClasses[$departure->status_label ?? 'Inconnu'] }}">
-                                        {{ $departure->status_label ?? 'Inconnu' }}
+                                <td class="px-4 py-3">
+                                    <span class="px-2 py-1 text-xs font-semibold rounded-full {{ $statusClasses[$departure->status_label] }}">
+                                        {{ $departure->status_label }}
                                     </span>
                                 </td>
                             </tr>
@@ -80,8 +80,8 @@
                 </table>
             </div>
         @else
-            <div class="text-center py-4 text-gray-500">
-                Aucun départ prévu
+            <div class="text-center py-8">
+                <p class="text-gray-500">Aucun départ prévu pour le moment.</p>
             </div>
         @endif
     </div>
