@@ -13,7 +13,6 @@
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
                 <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contenu</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Position</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
@@ -22,9 +21,6 @@
             <tbody class="bg-white divide-y divide-gray-200">
                 @foreach($announcements as $announcement)
                 <tr>
-                    <td class="px-6 py-4 whitespace-normal">
-                        <div class="text-sm text-gray-900">{{ $announcement->content }}</div>
-                    </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                         <div class="text-sm text-gray-900">{{ $announcement->formatted_position }}</div>
                     </td>
@@ -57,6 +53,10 @@
                 @endforeach
             </tbody>
         </table>
+    </div>
+    
+    <div class="mt-4">
+        {{ $announcements->links() }}
     </div>
 </div>
 

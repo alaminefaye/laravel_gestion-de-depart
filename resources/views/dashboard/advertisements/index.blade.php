@@ -34,7 +34,6 @@
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ordre</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Titre</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aperçu</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                     </tr>
@@ -45,9 +44,7 @@
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="text-sm text-gray-900">{{ $ad->display_order }}</span>
                             </td>
-                            <td class="px-6 py-4">
-                                <div class="text-sm text-gray-900">{{ $ad->title }}</div>
-                            </td>
+                            
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm text-gray-900">
                                     @if($ad->video_type === 'upload')
@@ -74,7 +71,7 @@
                                         @if($ad->video_file)
                                             <button onclick="previewVideo('{{ Storage::url($ad->video_file) }}')" 
                                                     class="text-blue-600 hover:text-blue-800">
-                                                <i class="fas fa-play mr-1"></i> Aperçu
+                                                <i class="fas fa-play mr-1"></i> Voir la vidéo
                                             </button>
                                         @else
                                             <span class="text-gray-500">Aucun fichier</span>
@@ -113,7 +110,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                            <td colspan="5" class="px-6 py-4 text-center text-gray-500">
                                 Aucune publicité trouvée
                             </td>
                         </tr>
