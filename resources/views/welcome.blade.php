@@ -83,9 +83,9 @@
 
     <!-- Announcements Section -->
     @php
-        $announcements = Cache::remember('header_announcements', 300, function () {
-            return App\Models\Announcement::where('position', 'header')
-                ->where('is_active', true)
+        $announcements = Cache::remember('active_announcements', 300, function () {
+            return App\Models\Announcement::where('is_active', true)
+                ->orderBy('created_at', 'desc')
                 ->get();
         });
     @endphp
@@ -122,6 +122,9 @@
     <script>
         // Pass PHP variables to JavaScript
         const announcements = @json($announcements);
+        window.addEventListener('DOMContentLoaded', (event) => {
+            window.carouselInstance = new AnnouncementCarousel(announcements);
+        });
     </script>
     <script src="{{ asset('js/welcome.js') }}"></script>
 </body>

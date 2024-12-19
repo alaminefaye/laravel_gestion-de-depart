@@ -4,9 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Models\Announcement;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class AnnouncementController extends Controller
 {
+    private function clearAnnouncementCache()
+    {
+        Cache::forget('active_announcements');
+    }
+
     public function index()
     {
         $announcements = Announcement::latest()->paginate(10);
@@ -30,6 +36,9 @@ class AnnouncementController extends Controller
         $validated['title'] = substr($validated['content'], 0, 100);
 
         Announcement::create($validated);
+        
+        // Vider le cache après création
+        $this->clearAnnouncementCache();
 
         return redirect()->route('dashboard.announcements.index')
             ->with('success', 'Annonce créée avec succès.');
@@ -57,6 +66,9 @@ class AnnouncementController extends Controller
         $validated['is_active'] = $request->boolean('is_active');
 
         $announcement->update($validated);
+        
+        // Vider le cache après mise à jour
+        $this->clearAnnouncementCache();
 
         return redirect()->route('dashboard.announcements.index')
             ->with('success', 'Annonce mise à jour avec succès.');
@@ -65,6 +77,9 @@ class AnnouncementController extends Controller
     public function destroy(Announcement $announcement)
     {
         $announcement->delete();
+        
+        // Vider le cache après suppression
+        $this->clearAnnouncementCache();
 
         return redirect()->route('dashboard.announcements.index')
             ->with('success', 'Annonce supprimée avec succès.');
@@ -75,6 +90,9 @@ class AnnouncementController extends Controller
         $announcement->update([
             'is_active' => !$announcement->is_active
         ]);
+        
+        // Vider le cache après changement de statut
+        $this->clearAnnouncementCache();
 
         return back()->with('success', 'Statut de l\'annonce mis à jour avec succès.');
     }
@@ -82,10 +100,12 @@ class AnnouncementController extends Controller
     // API endpoint for front-end
     public function getActive()
     {
-        $announcements = Announcement::where('is_active', true)
-            ->orderBy('position')
-            ->orderBy('created_at', 'desc')
-            ->get();
-        return response()->json($announcements);
+        return response()->json(
+            Cache::remember('active_announcements', 300, function () {
+                return Announcement::where('is_active', true)
+                    ->orderBy('created_at', 'desc')
+                    ->get();
+            })
+        );
     }
 }
