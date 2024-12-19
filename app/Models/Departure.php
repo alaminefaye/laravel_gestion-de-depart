@@ -44,7 +44,7 @@ class Departure extends Model
         'formatted_delayed_date',
         'formatted_delayed_time',
         'formatted_price',
-        'places_disponibles'
+        'calculated_places_disponibles'
     ];
 
     public function bus()
@@ -111,7 +111,7 @@ class Departure extends Model
         return number_format($this->prix, 0, ',', ' ') . ' FCFA';
     }
 
-    public function getPlacesDisponiblesAttribute()
+    public function getCalculatedPlacesDisponiblesAttribute()
     {
         if (!$this->bus) {
             return 0;

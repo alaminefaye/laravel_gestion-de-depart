@@ -80,6 +80,10 @@
                     <input type="number" name="places_disponibles" id="places_disponibles" min="0" 
                            value="{{ old('places_disponibles', $departure->places_disponibles) }}" 
                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" required>
+                    <p id="places-help" class="mt-1 text-sm text-gray-500"></p>
+                    <p class="mt-1 text-sm text-gray-500">
+                        Places calculées automatiquement: {{ $departure->calculated_places_disponibles }}
+                    </p>
                 </div>
 
                 <div>
@@ -140,5 +144,40 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialisation
     updateDelayedTime();
 });
+
+const busSelect = document.getElementById('bus_id');
+const placesInput = document.getElementById('places_disponibles');
+        
+// Créer un objet avec les capacités des bus
+const busCapacities = {
+    @foreach($buses as $bus)
+        {{ $bus->id }}: {{ $bus->capacite }},
+    @endforeach
+};
+        
+// Mettre à jour la limite max du champ places_disponibles
+function updatePlacesMax() {
+    const selectedBusId = busSelect.value;
+    const capacity = busCapacities[selectedBusId] || 0;
+            
+    placesInput.max = capacity;
+            
+    // Si la valeur actuelle dépasse la nouvelle capacité, la réduire
+    if (parseInt(placesInput.value) > capacity) {
+        placesInput.value = capacity;
+    }
+            
+    // Mettre à jour le message d'aide
+    const helpText = document.getElementById('places-help');
+    if (helpText) {
+        helpText.textContent = `Maximum: ${capacity} places (capacité du bus)`;
+    }
+}
+        
+// Ajouter l'écouteur d'événement pour le changement de bus
+busSelect.addEventListener('change', updatePlacesMax);
+        
+// Exécuter une fois au chargement
+updatePlacesMax();
 </script>
 @endpush

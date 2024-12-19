@@ -54,6 +54,8 @@ class DepartureController extends Controller
 
     public function store(Request $request)
     {
+        $bus = Bus::findOrFail($request->bus_id);
+        
         $validatedData = $request->validate([
             'route' => 'required|string|max:255',
             'scheduled_time' => 'required|date',
@@ -61,7 +63,16 @@ class DepartureController extends Controller
             'status' => 'required|integer|in:1,2,3',
             'bus_id' => 'required|exists:buses,id',
             'prix' => 'required|numeric|min:0',
-            'places_disponibles' => 'required|integer|min:0',
+            'places_disponibles' => [
+                'required',
+                'integer',
+                'min:0',
+                function ($attribute, $value, $fail) use ($bus) {
+                    if ($value > $bus->capacite) {
+                        $fail('Le nombre de places disponibles ne peut pas dépasser la capacité du bus (' . $bus->capacite . ' places).');
+                    }
+                },
+            ],
         ]);
 
         try {
@@ -109,6 +120,8 @@ class DepartureController extends Controller
 
     public function update(Request $request, Departure $departure)
     {
+        $bus = Bus::findOrFail($request->bus_id);
+        
         $validatedData = $request->validate([
             'route' => 'required|string|max:255',
             'scheduled_time' => 'required|date',
@@ -116,7 +129,16 @@ class DepartureController extends Controller
             'status' => 'required|in:'.Departure::STATUS_ON_TIME.','.Departure::STATUS_DELAYED.','.Departure::STATUS_CANCELLED,
             'bus_id' => 'required|exists:buses,id',
             'prix' => 'required|numeric|min:0',
-            'places_disponibles' => 'required|integer|min:0',
+            'places_disponibles' => [
+                'required',
+                'integer',
+                'min:0',
+                function ($attribute, $value, $fail) use ($bus) {
+                    if ($value > $bus->capacite) {
+                        $fail('Le nombre de places disponibles ne peut pas dépasser la capacité du bus (' . $bus->capacite . ' places).');
+                    }
+                },
+            ],
         ]);
 
         try {

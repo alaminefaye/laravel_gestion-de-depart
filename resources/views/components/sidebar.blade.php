@@ -14,6 +14,11 @@
     </div>
 
     <!-- Menu de navigation -->
+    <a href="{{ route('dashboard.statistics') }}" 
+           class="flex items-center px-4 py-3 text-white hover:bg-blue-800 transition-colors {{ request()->routeIs('dashboard.statistics') ? 'bg-blue-800' : '' }}">
+            <i class="fas fa-chart-line w-6"></i>
+            <span class="ml-3">Statistiques</span>
+        </a>
     <nav class="mt-4">
         <a href="{{ route('dashboard.departures.index') }}" 
            class="flex items-center px-4 py-3 text-white hover:bg-blue-800 transition-colors {{ request()->routeIs('dashboard.departures.*') ? 'bg-blue-800' : '' }}">
@@ -21,11 +26,7 @@
             <span class="ml-3">Départs</span>
         </a>
 
-        <a href="{{ route('dashboard.statistics') }}" 
-           class="flex items-center px-4 py-3 text-white hover:bg-blue-800 transition-colors {{ request()->routeIs('dashboard.statistics') ? 'bg-blue-800' : '' }}">
-            <i class="fas fa-chart-line w-6"></i>
-            <span class="ml-3">Statistiques</span>
-        </a>
+        
 
         <a href="{{ route('dashboard.buses.index') }}" 
            class="flex items-center px-4 py-3 text-white hover:bg-blue-800 transition-colors {{ request()->routeIs('dashboard.buses.*') ? 'bg-blue-800' : '' }}">
