@@ -14,7 +14,6 @@
                 <div class="text-5xl font-bold text-white text-center tracking-tight transition-all duration-300 transform group-hover:scale-105" id="current-time"></div>
                 <div class="absolute -inset-0.5 bg-blue-400 rounded-lg opacity-0 group-hover:opacity-10 transition duration-300 blur"></div>
             </div>
-            <div class="text-base text-blue-100 text-center mt-2 font-medium transition-all duration-300 hover:text-white" id="current-date"></div>
         </div>
     </div>
 
@@ -48,21 +47,19 @@
                                 <div class="flex-1 min-w-[200px]">
                                     <div class="space-y-1">
                                         <div class="flex items-center gap-2">
-                                            <i class="fas fa-clock text-gray-400"></i>
-                                            <div>
-                                                <div class="text-xs text-gray-500">{{ $departure->formatted_scheduled_date }}</div>
-                                                <div class="text-sm font-bold text-gray-900">{{ $departure->formatted_scheduled_time }}</div>
+                                            <i class="fas fa-clock text-gray-400 text-lg"></i>
+                                            <div class="flex items-center gap-2">
+                                                @if($departure->formatted_delayed_time)
+                                                    <div class="text-base md:text-lg font-bold text-gray-900 line-through">{{ $departure->formatted_scheduled_time }}</div>
+                                                    <div class="text-base md:text-lg font-bold text-white bg-red-600 px-3 py-1 rounded-md flex items-center">
+                                                        <span class="mr-2">→</span>
+                                                        {{ $departure->formatted_delayed_time }}
+                                                    </div>
+                                                @else
+                                                    <div class="text-base md:text-lg font-bold text-gray-900">{{ $departure->formatted_scheduled_time }}</div>
+                                                @endif
                                             </div>
                                         </div>
-                                        @if($departure->formatted_delayed_time)
-                                            <div class="flex items-center gap-2">
-                                                <i class="fas fa-history text-red-400"></i>
-                                                <div>
-                                                    <div class="text-xs text-gray-500">{{ $departure->formatted_delayed_date }}</div>
-                                                    <div class="text-sm font-bold text-red-600">{{ $departure->formatted_delayed_time }}</div>
-                                                </div>
-                                            </div>
-                                        @endif
                                     </div>
                                 </div>
 
@@ -109,7 +106,6 @@
     function updateTime() {
         const now = new Date();
         const timeElement = document.getElementById('current-time');
-        const dateElement = document.getElementById('current-date');
         
         // Format personnalisé pour H:MM:S
         const hours = now.getHours();
@@ -117,10 +113,7 @@
         const seconds = now.getSeconds().toString().padStart(2, '0');
         const customTime = `${hours}:${minutes}:${seconds}`;
         
-        const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-        
         timeElement.textContent = customTime;
-        dateElement.textContent = now.toLocaleDateString('fr-FR', dateOptions).charAt(0).toUpperCase() + now.toLocaleDateString('fr-FR', dateOptions).slice(1);
     }
 
     updateTime();
