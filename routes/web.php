@@ -79,6 +79,18 @@ Route::middleware(['auth'])->group(function () {
     });
 });
 
+// Temporary route to check departure data
+Route::get('/check-departures', function () {
+    return App\Models\Departure::with('bus')->get()->map(function($departure) {
+        return [
+            'id' => $departure->id,
+            'route' => $departure->route,
+            'status' => $departure->status,
+            'status_label' => $departure->status_label,
+        ];
+    });
+});
+
 Route::get('/{any}', function () {
     return view('app');
 })->where('any', '.*');

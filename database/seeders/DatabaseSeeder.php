@@ -13,6 +13,8 @@ use Database\Seeders\AnnouncementSeeder;
 use Database\Seeders\AdminUserSeeder;
 use Database\Seeders\AdvertisementSeeder;
 use Database\Seeders\RolesAndPermissionsSeeder;
+use Database\Seeders\BusSeeder;
+use Database\Seeders\DepartureSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -23,6 +25,8 @@ class DatabaseSeeder extends Seeder
             AdminUserSeeder::class,
             AdvertisementSeeder::class,
             AnnouncementSeeder::class,
+            BusSeeder::class,
+            DepartureSeeder::class,
         ]);
 
         // Création de l'utilisateur de test

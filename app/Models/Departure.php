@@ -58,7 +58,7 @@ class Departure extends Model
 
     public function getStatusLabelAttribute()
     {
-        return match($this->status) {
+        return match((int)$this->status) {
             self::STATUS_ON_TIME => 'À l\'heure',
             self::STATUS_DELAYED => 'En retard',
             self::STATUS_CANCELLED => 'Annulé',

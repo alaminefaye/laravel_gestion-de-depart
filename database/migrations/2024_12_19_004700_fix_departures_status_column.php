@@ -9,8 +9,10 @@ return new class extends Migration
 {
     public function up()
     {
-        DB::statement("ALTER TABLE departures MODIFY COLUMN status ENUM('A l\\'heure', 'En retard', 'Annulé') NOT NULL DEFAULT 'A l\\'heure'");
-        
+        Schema::table('departures', function (Blueprint $table) {
+            DB::statement("ALTER TABLE departures MODIFY status VARCHAR(255) NOT NULL DEFAULT 'A l''heure'");
+        });
+
         // Update existing statuses
         DB::table('departures')
             ->where('status', 'On time')
@@ -27,9 +29,11 @@ return new class extends Migration
 
     public function down()
     {
-        DB::statement("ALTER TABLE departures MODIFY COLUMN status ENUM('On time', 'Delayed', 'Cancelled') NOT NULL DEFAULT 'On time'");
-        
-        // Update existing statuses back
+        Schema::table('departures', function (Blueprint $table) {
+            DB::statement("ALTER TABLE departures MODIFY status VARCHAR(255) NOT NULL DEFAULT 'On time'");
+        });
+
+        // Revert status values
         DB::table('departures')
             ->where('status', 'A l\'heure')
             ->update(['status' => 'On time']);

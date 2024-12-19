@@ -25,9 +25,10 @@
         @if(count($departures) > 0)
             @php
                 $statusClasses = [
-                    'À l\'heure' => 'bg-green-100 text-green-800 border border-green-200',
-                    'En retard' => 'bg-yellow-100 text-yellow-800 border border-yellow-200',
-                    'Annulé' => 'bg-red-100 text-red-800 border border-red-200',
+                    'À l\'heure' => 'bg-green-500 text-white border border-green-700',
+                    'En retard' => 'bg-orange-500 text-white border border-orange-700',
+                    'Annulé' => 'bg-red-500 text-white border border-red-700',
+                    'Inconnu' => 'bg-gray-500 text-white border border-gray-700',
                 ];
             @endphp
             <div class="overflow-x-auto rounded-lg border border-gray-200">
@@ -69,8 +70,8 @@
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-3 py-1 text-xs font-bold rounded-full {{ $statusClasses[$departure->status_label] }}">
-                                        {{ $departure->status_label }}
+                                    <span class="px-3 py-1 text-xs font-bold rounded-full {{ $statusClasses[$departure->status_label ?? 'Inconnu'] }}">
+                                        {{ $departure->status_label ?? 'Inconnu' }}
                                     </span>
                                 </td>
                             </tr>
@@ -79,8 +80,8 @@
                 </table>
             </div>
         @else
-            <div class="text-center py-8">
-                <div class="text-gray-500 text-lg">Aucun départ disponible pour le moment</div>
+            <div class="text-center py-4 text-gray-500">
+                Aucun départ prévu
             </div>
         @endif
     </div>

@@ -137,11 +137,15 @@
                         {{ $departure->formatted_delayed_time ?: '-' }}
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                            @if($departure->status === App\Models\Departure::STATUS_ON_TIME) bg-green-100 text-green-800
-                            @elseif($departure->status === App\Models\Departure::STATUS_DELAYED) bg-yellow-100 text-yellow-800
-                            @elseif($departure->status === App\Models\Departure::STATUS_CANCELLED) bg-red-100 text-red-800
-                            @endif">
+                        @php
+                            $statusClasses = [
+                                'À l\'heure' => 'bg-green-500 text-white border border-green-700',
+                                'En retard' => 'bg-orange-500 text-white border border-orange-700',
+                                'Annulé' => 'bg-red-500 text-white border border-red-700',
+                                'Inconnu' => 'bg-gray-500 text-white border border-gray-700',
+                            ];
+                        @endphp
+                        <span class="px-3 py-1 text-xs font-bold rounded-full {{ $statusClasses[$departure->status_label ?? 'Inconnu'] }}">
                             {{ $departure->status_label }}
                         </span>
                     </td>
